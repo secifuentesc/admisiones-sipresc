@@ -31,7 +31,7 @@ export async function guardarRegistro(datos) {
       pazYSalvo
     };
 
-    // IMPORTANTE: Cambiar mode a 'cors' y agregar método POST
+    // IMPORTANTE: Usar 'cors' en lugar de 'no-cors'
     const response = await fetch(API_URL, {
       method: "POST",
       mode: "cors",
