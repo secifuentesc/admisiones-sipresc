@@ -1,5 +1,5 @@
 // src/api.js
-const API_URL = "https://script.google.com/macros/s/AKfycbybF614uTYGOX3lU4FeNnBhqTbUmAcpiXGVCYNizBk7XPlcKsvUljU3RBMH-ANf9hOV/exec";
+const API_URL = "/api/proxy";
 
 // Convertir archivo a base64
 const fileToBase64 = (file) => {
@@ -14,7 +14,6 @@ const fileToBase64 = (file) => {
 // Guardar registro con archivos
 export async function guardarRegistro(datos) {
   try {
-    // Procesar archivos si existen
     const comprobantePago = datos.comprobantePago ? await fileToBase64(datos.comprobantePago) : null;
     const registroCivil = datos.registroCivil ? await fileToBase64(datos.registroCivil) : null;
     const informeAcademico = datos.informeAcademico ? await fileToBase64(datos.informeAcademico) : null;
@@ -31,17 +30,16 @@ export async function guardarRegistro(datos) {
       pazYSalvo
     };
 
-    // Enviar como texto plano para evitar preflight CORS
     const response = await fetch(API_URL, {
       method: "POST",
-      mode: "no-cors",
       headers: {
-        "Content-Type": "text/plain",  // ← CAMBIO IMPORTANTE
+        "Content-Type": "application/json",
       },
       body: JSON.stringify(payload)
     });
 
-    return { success: true };
+    const resultado = await response.json();
+    return resultado;
     
   } catch (error) {
     console.error("Error guardando registro:", error);
@@ -49,14 +47,15 @@ export async function guardarRegistro(datos) {
   }
 }
 
-// Consultar estado (GET no tiene problema)
+// Consultar estado
 export async function consultarEstado(correo, celular) {
   const params = new URLSearchParams();
   params.append("accion", "consultar");
   if (correo) params.append("correo", correo);
   if (celular) params.append("celular", celular);
   
-  const response = await fetch(`${API_URL}?${params.toString()}`);
+  const API_URL_GET = "https://script.google.com/macros/s/AKfycbybF614uTYGOX3lU4FeNnBhqTbUmAcpiXGVCYNizBk7XPlcKsvUljU3RBMH-ANf9hOV/exec";
+  const response = await fetch(`${API_URL_GET}?${params.toString()}`);
   const data = await response.json();
   return data;
 }
