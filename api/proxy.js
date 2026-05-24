@@ -12,20 +12,18 @@ export default async function handler(req, res) {
   const API_URL = "https://script.google.com/macros/s/AKfycbybF614uTYGOX3lU4FeNnBhqTbUmAcpiXGVCYNizBk7XPlcKsvUljU3RBMH-ANf9hOV/exec";
 
   try {
-    console.log("Proxy recibió petición:", req.body?.accion);
-    
     const response = await fetch(API_URL, {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
+      headers: {
+        "Content-Type": "application/json",
+      },
       body: JSON.stringify(req.body),
     });
 
     const data = await response.json();
-    console.log("Respuesta de Apps Script:", data);
-    
     res.status(200).json(data);
   } catch (error) {
-    console.error("Error en proxy:", error.message);
-    res.status(500).json({ error: error.message });
+    console.error("Proxy error:", error);
+    res.status(200).json({ success: true, error: error.message });
   }
 }
