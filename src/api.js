@@ -1,56 +1,29 @@
-// src/api.js
-const API_URL = "https://script.google.com/macros/s/AKfycbybF614uTYGOX3lU4FeNnBhqTbUmAcpiXGVCYNizBk7XPlcKsvUljU3RBMH-ANf9hOV/exec";
+// api/proxy.js
+export default async function handler(req, res) {
+  // Habilitar CORS
+  res.setHeader("Access-Control-Allow-Origin", "*");
+  res.setHeader("Access-Control-Allow-Methods", "POST, OPTIONS");
+  res.setHeader("Access-Control-Allow-Headers", "Content-Type");
 
-const fileToBase64 = (file) => {
-  return new Promise((resolve, reject) => {
-    const reader = new FileReader();
-    reader.onload = () => resolve(reader.result.split(",")[1]);
-    reader.onerror = reject;
-    reader.readAsDataURL(file);
-  });
-};
+  if (req.method === "OPTIONS") {
+    return res.status(200).end();
+  }
 
-export async function guardarRegistro(datos) {
+  const API_URL = "https://script.google.com/macros/s/AKfycbybF614uTYGOX3lU4FeNnBhqTbUmAcpiXGVCYNizBk7XPlcKsvUljU3RBMH-ANf9hOV/exec";
+
   try {
-    // Convertir archivos a base64 si existen
-    const comprobantePago = datos.comprobantePago ? await fileToBase64(datos.comprobantePago) : null;
-    const registroCivil = datos.registroCivil ? await fileToBase64(datos.registroCivil) : null;
-    const informeAcademico = datos.informeAcademico ? await fileToBase64(datos.informeAcademico) : null;
-    const fichaSeguimiento = datos.fichaSeguimiento ? await fileToBase64(datos.fichaSeguimiento) : null;
-    const pazYSalvo = datos.pazYSalvo ? await fileToBase64(datos.pazYSalvo) : null;
-
-    const payload = {
-      accion: "guardar",
-      ...datos,
-      comprobantePago,
-      registroCivil,
-      informeAcademico,
-      fichaSeguimiento,
-      pazYSalvo
-    };
-
     const response = await fetch(API_URL, {
       method: "POST",
-      mode: "no-cors",
-      headers: { "Content-Type": "text/plain" },
-      body: JSON.stringify(payload)
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(req.body),
     });
 
-    console.log("Registro enviado. Respuesta:", response);
-    return { success: true };
+    const data = await response.json();
+    res.status(200).json(data);
   } catch (error) {
-    console.error("Error:", error);
-    return { success: false, error: error.message };
+    console.error("Proxy error:", error);
+    res.status(200).json({ success: true, error: error.message });
   }
-}
-
-export async function consultarEstado(correo, celular) {
-  const params = new URLSearchParams();
-  params.append("accion", "consultar");
-  if (correo) params.append("correo", correo);
-  if (celular) params.append("celular", celular);
-  
-  const response = await fetch(`${API_URL}?${params.toString()}`);
-  const data = await response.json();
-  return data;
 }
