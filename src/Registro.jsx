@@ -1545,14 +1545,58 @@ export default function Registro() {
     }
   };
 
-  const handleSubmit = async () => {
-    setSending(true);
-    // TODO: conectar con backend cuando esté listo
-    await new Promise(r => setTimeout(r, 1200));
+import { guardarRegistro } from "./api";
+
+// Reemplaza la función handleSubmit existente
+const handleSubmit = async () => {
+  setSending(true);
+  
+  try {
+    // Preparar datos para enviar
+    const datosAEnviar = {
+      tipoRegistro: data.tipoRegistro,
+      correo: data.correo,
+      correoOwner: data.correoOwner,
+      nombreAspirante: data.nombreAspirante,
+      apellidosAspirante: data.apellidosAspirante,
+      fechaNacimiento: data.fechaNacimiento,
+      edad: data.edad,
+      grado: data.grado,
+      estudiaActual: data.estudiaActual,
+      colegioProcedencia: data.colegioProcedencia,
+      nombrePadre: data.nombrePadre,
+      apellidosPadre: data.apellidosPadre,
+      correoPadre: data.correoPadre,
+      celularPadre: data.celularPadre,
+      nombreMadre: data.nombreMadre,
+      apellidosMadre: data.apellidosMadre,
+      correoMadre: data.correoMadre,
+      celularMadre: data.celularMadre,
+      nombreOtro: data.nombreOtro,
+      apellidosOtro: data.apellidosOtro,
+      correoOtro: data.correoOtro,
+      celularOtro: data.celularOtro,
+      motivacion: data.motivacion,
+      canalEnterado: data.canalEnterado,
+      asistirOpenHouse: data.asistirOpenHouse,
+      numeroAsistentes: data.numeroAsistentes,
+      nombresAsistentes: data.nombresAsistentes,
+      continuarAdmision: data.continuarAdmision,
+    };
+    
+    await guardarRegistro(datosAEnviar);
+    
+    // Limpiar localStorage
     if (data.correo) localStorage.removeItem(`registro_${data.correo}`);
-    setSending(false);
+    
     setPhase("done");
-  };
+  } catch (error) {
+    console.error("Error al enviar:", error);
+    alert("Hubo un error al enviar el registro. Por favor, intenta de nuevo.");
+  } finally {
+    setSending(false);
+  }
+};
 
   const renderStep = () => {
     if (!currentStep) return null;
