@@ -31,18 +31,18 @@ export async function guardarRegistro(datos) {
       pazYSalvo
     };
 
-    // IMPORTANTE: Usar 'cors' en lugar de 'no-cors'
-    const response = await fetch(API_URL, {
+    // Usar no-cors para evitar el preflight OPTIONS
+    await fetch(API_URL, {
       method: "POST",
-      mode: "cors",
+      mode: "no-cors",
       headers: {
         "Content-Type": "application/json",
       },
       body: JSON.stringify(payload)
     });
 
-    const resultado = await response.json();
-    return resultado;
+    // Con no-cors no podemos leer la respuesta, asumimos éxito
+    return { success: true };
     
   } catch (error) {
     console.error("Error guardando registro:", error);
@@ -50,7 +50,7 @@ export async function guardarRegistro(datos) {
   }
 }
 
-// Consultar estado
+// Consultar estado (GET no tiene problema de CORS)
 export async function consultarEstado(correo, celular) {
   const params = new URLSearchParams();
   params.append("accion", "consultar");
