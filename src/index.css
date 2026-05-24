@@ -1,0 +1,89 @@
+@font-face {
+  font-family: 'CollegiateBlackFLF';
+  src: url('/fonts/CollegiateBlackFLF.ttf') format('truetype');
+  font-weight: 900;
+  font-style: normal;
+  font-display: swap;
+}
+
+
+/* Google Fonts */
+@import url('https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,400;0,600;0,700;0,800;0,900;1,400&family=Poppins:ital,wght@0,300;0,400;0,500;0,600;0,700;1,300;1,400&family=Playfair+Display:ital,wght@0,400;0,600;1,400;1,600&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Base reset */
+*, *::before, *::after {
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  margin: 0;
+  padding: 0;
+  overflow-x: hidden;
+  background: #FFFFFF;
+  color: #21145F;
+}
+
+/* Safe area for mobile CTA */
+.pb-safe {
+  padding-bottom: env(safe-area-inset-bottom, 1rem);
+}
+
+/* Smooth scrolling */
+::-webkit-scrollbar {
+  width: 4px;
+}
+::-webkit-scrollbar-track {
+  background: #F7F8FC;
+}
+::-webkit-scrollbar-thumb {
+  background: #21145F;
+  border-radius: 2px;
+}
+
+/* Selection color */
+::selection {
+  background: #FFCC00;
+  color: #21145F;
+}
+
+/* Section fade-in utility (complementary to Framer Motion) */
+.section-visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.hero-title {
+  font-size: clamp(3.1rem, 6vw, 6rem);
+  line-height: 0.96;
+  max-width: 980px;
+}
+
+.hero-dynamic-line {
+  min-height: 1.05em;
+}
+
+@media (max-width: 1024px) {
+  .hero-title {
+    font-size: clamp(2.7rem, 7vw, 4.6rem);
+    max-width: 760px;
+  }
+}
+
+@media (max-width: 640px) {
+  .hero-title {
+    font-size: clamp(2.35rem, 12vw, 4rem);
+    line-height: 0.98;
+  }
+
+  .hero-title span {
+    white-space: normal;
+  }
+}
