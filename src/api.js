@@ -1,7 +1,44 @@
 // src/api.js
-const API_URL = "https://script.google.com/macros/s/AKfycbybF614uTYGOX3lU4FeNnBhqTbUmAcpiXGVCYNizBk7XPlcKsvUljU3RBMH-ANf9hOV/exec";
+const API_URL = "https://script.google.com/macros/s/TU_NUEVA_URL/exec";
 
-// Consultar estado de un proceso
+export async function guardarRegistro(datos) {
+  // Convertir archivos a base64
+  const convertirArchivoABase64 = (file) => {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onload = () => resolve(reader.result.split(",")[1]);
+      reader.onerror = reject;
+      reader.readAsDataURL(file);
+    });
+  };
+
+  // Procesar archivos
+  const comprobantePago = datos.comprobantePago ? await convertirArchivoABase64(datos.comprobantePago) : null;
+  const registroCivil = datos.registroCivil ? await convertirArchivoABase64(datos.registroCivil) : null;
+  const informeAcademico = datos.informeAcademico ? await convertirArchivoABase64(datos.informeAcademico) : null;
+  const fichaSeguimiento = datos.fichaSeguimiento ? await convertirArchivoABase64(datos.fichaSeguimiento) : null;
+  const pazYSalvo = datos.pazYSalvo ? await convertirArchivoABase64(datos.pazYSalvo) : null;
+
+  const payload = {
+    accion: "guardar",
+    ...datos,
+    comprobantePago,
+    registroCivil,
+    informeAcademico,
+    fichaSeguimiento,
+    pazYSalvo
+  };
+
+  const response = await fetch(API_URL, {
+    method: "POST",
+    mode: "no-cors",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(payload)
+  });
+
+  return { success: true };
+}
+
 export async function consultarEstado(correo, celular) {
   const params = new URLSearchParams();
   params.append("accion", "consultar");
@@ -11,40 +48,4 @@ export async function consultarEstado(correo, celular) {
   const response = await fetch(`${API_URL}?${params.toString()}`);
   const data = await response.json();
   return data;
-}
-
-// Guardar un nuevo registro
-export async function guardarRegistro(datos) {
-  const response = await fetch(API_URL, {
-    method: "POST",
-    mode: "no-cors", // importante para Apps Script
-    headers: {
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify({
-      accion: "guardar",
-      ...datos
-    })
-  });
-  
-  // Con no-cors, no podemos leer la respuesta directamente
-  return { success: true, message: "Registro enviado" };
-}
-
-// Actualizar estado (solo para administración)
-export async function actualizarEstado(id, estado, datosAdicionales) {
-  const response = await fetch(API_URL, {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify({
-      accion: "actualizarEstado",
-      id,
-      estado,
-      ...datosAdicionales
-    })
-  });
-  
-  return response.json();
 }
