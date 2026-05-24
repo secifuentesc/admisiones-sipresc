@@ -1,11 +1,10 @@
 // api/proxy.js
 export default async function handler(req, res) {
-  // Habilitar CORS para la respuesta
+  // Habilitar CORS
   res.setHeader("Access-Control-Allow-Origin", "*");
   res.setHeader("Access-Control-Allow-Methods", "POST, OPTIONS");
   res.setHeader("Access-Control-Allow-Headers", "Content-Type");
 
-  // Responder a preflight
   if (req.method === "OPTIONS") {
     return res.status(200).end();
   }
@@ -15,9 +14,7 @@ export default async function handler(req, res) {
   try {
     const response = await fetch(API_URL, {
       method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
+      headers: { "Content-Type": "application/json" },
       body: JSON.stringify(req.body),
     });
 
