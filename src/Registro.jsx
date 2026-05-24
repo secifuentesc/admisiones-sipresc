@@ -1,6 +1,8 @@
 import { useState, useEffect, useRef, useCallback } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 
+import { guardarRegistro } from "./api";
+
 // ─── FONTS ────────────────────────────────────────────────────────────────────
 const FONTS = `
 @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800;900&family=Poppins:wght@300;400;500;600&display=swap');
@@ -1545,7 +1547,6 @@ export default function Registro() {
     }
   };
 
-import { guardarRegistro } from "./api";
 
 // Reemplaza la función handleSubmit existente
 const handleSubmit = async () => {
