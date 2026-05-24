@@ -6,7 +6,7 @@ import AdmisionesRegistro from "./AdmisionesRegistro"; // landing con los 3 boto
 import Registro from "./Registro"; // nuevo formulario con los 4 cambios
 
 // ─── CONFIG ──────────────────────────────────────────────────────────────────
-const FORM_URL = "/admisiones2027/admisiones/registro";
+const FORM_URL = "/admisiones/registro";
 
 
 const DYNAMIC_PHRASES = [
