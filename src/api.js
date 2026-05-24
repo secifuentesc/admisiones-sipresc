@@ -12,6 +12,7 @@ const fileToBase64 = (file) => {
 
 export async function guardarRegistro(datos) {
   try {
+    // Convertir archivos a base64 si existen
     const comprobantePago = datos.comprobantePago ? await fileToBase64(datos.comprobantePago) : null;
     const registroCivil = datos.registroCivil ? await fileToBase64(datos.registroCivil) : null;
     const informeAcademico = datos.informeAcademico ? await fileToBase64(datos.informeAcademico) : null;
@@ -28,16 +29,14 @@ export async function guardarRegistro(datos) {
       pazYSalvo
     };
 
-    // Usar text/plain para evitar preflight CORS
     const response = await fetch(API_URL, {
       method: "POST",
       mode: "no-cors",
-      headers: {
-        "Content-Type": "text/plain",
-      },
+      headers: { "Content-Type": "text/plain" },
       body: JSON.stringify(payload)
     });
 
+    console.log("Registro enviado. Respuesta:", response);
     return { success: true };
   } catch (error) {
     console.error("Error:", error);
