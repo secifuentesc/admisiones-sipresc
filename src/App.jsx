@@ -5,6 +5,8 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import AdmisionesRegistro from "./AdmisionesRegistro"; // landing con los 3 botones
 import Registro from "./Registro"; // nuevo formulario con los 4 cambios
 
+import { consultarEstado } from "./api";
+
 // ─── CONFIG ──────────────────────────────────────────────────────────────────
 const FORM_URL = "/admisiones/registro";
 
@@ -1391,6 +1393,7 @@ function AdmissionStatusModal({ open, onClose }) {
   const [searched, setSearched] = useState(false);
   const [results, setResults] = useState([]);
   const [selected, setSelected] = useState(null);
+  const [loading, setLoading] = useState(false);
 
   function normalize(value) {
     return String(value || "")
@@ -1399,28 +1402,47 @@ function AdmissionStatusModal({ open, onClose }) {
       .replace(/\s+/g, "");
   }
 
-  function handleSearch(e) {
-    e.preventDefault();
+  async function handleSearch(e) {
+  e.preventDefault();
 
-    const q = normalize(query);
+  const q = normalize(query);
+  if (!q) return;
 
-    if (!q) return;
+  setLoading(true);
 
-    const found = MOCK_ADMISSIONS.filter((item) => {
-      const fields = [
-        item.correoPadre,
-        item.correoMadre,
-        item.celularPadre,
-        item.celularMadre,
-      ].map(normalize);
-
-      return fields.includes(q);
-    });
-
-    setResults(found);
-    setSelected(found.length === 1 ? found[0] : null);
+  try {
+    const esCorreo = q.includes("@");
+    const esCelular = /^\d+$/.test(q);
+    
+    let resultado;
+    if (esCorreo) {
+      resultado = await consultarEstado(q, null);
+    } else if (esCelular) {
+      resultado = await consultarEstado(null, q);
+    } else {
+      setResults([]);
+      setSearched(true);
+      setLoading(false);
+      return;
+    }
+    
+    if (resultado && resultado.success && resultado.data) {
+      const found = resultado.data;
+      setResults(found);
+      setSelected(found.length === 1 ? found[0] : null);
+      setSearched(true);
+    } else {
+      setResults([]);
+      setSearched(true);
+    }
+  } catch (error) {
+    console.error("Error al consultar:", error);
+    setResults([]);
     setSearched(true);
+  } finally {
+    setLoading(false);
   }
+}
 
   function resetSearch() {
     setQuery("");
@@ -1502,12 +1524,12 @@ function AdmissionStatusModal({ open, onClose }) {
                   </div>
 
                   <button
-                    type="submit"
-                    className="w-full rounded-full px-6 py-4 bg-[#21145F] text-white font-bold text-sm tracking-wide transition-all hover:scale-[1.01]"
-                    style={{ fontFamily: "'Montserrat', sans-serif" }}
-                  >
-                    Consultar proceso
-                  </button>
+  type="submit"
+  disabled={loading}
+  className="w-full rounded-full px-6 py-4 bg-[#21145F] text-white font-bold text-sm tracking-wide transition-all hover:scale-[1.01]"
+>
+  {loading ? "Consultando..." : "Consultar proceso"}
+</button>
                 </form>
 
                 <p
