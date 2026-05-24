@@ -1,5 +1,5 @@
 // src/api.js
-const API_URL = "https://script.google.com/macros/s/TU_NUEVA_URL/exec";
+const API_URL = "https://script.google.com/macros/s/AKfycbybF614uTYGOX3lU4FeNnBhqTbUmAcpiXGVCYNizBk7XPlcKsvUljU3RBMH-ANf9hOV/exec";
 
 export async function guardarRegistro(datos) {
   // Convertir archivos a base64
