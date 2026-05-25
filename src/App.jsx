@@ -749,12 +749,9 @@ function StatsSection() {
       +{inView ? years : 0}
     </p>
 
-    <p
-      className="text-white/70 text-xs mt-1"
-      style={{ fontFamily: "'Poppins', sans-serif" }}
-    >
-      acompañando generaciones
-    </p>
+    <p className="text-xs mt-1" style={{ fontFamily: "'Poppins', sans-serif", color: "rgba(255,255,255,0.6)" }}>
+  acompañando generaciones
+</p>
   </div>
 </motion.div>
 
