@@ -1795,27 +1795,25 @@ function formatHora(horaIso) {
       </div>
 
             <div className="grid md:grid-cols-3 gap-4 mb-6">
-        <StatusInfoCard
-          title="Prueba o pasantía"
-          date={item["Prueba fecha"]}
-          hour={item["Prueba hora"]}
-          detail={item["Tipo actividad"]}
-        />
-
-        <StatusInfoCard
-          title="Entrevista"
-          date={item["Entrevista fecha"]}
-          hour={item["Entrevista hora"]}
-          detail={item["Responsable entrevista"]}
-        />
-
-        <StatusInfoCard
-          title="Inducción"
-          date={item["Inducción fecha"]}
-          hour={item["Inducción hora"]}
-          detail="Nuevas familias"
-        />
-      </div>
+  <StatusInfoCard
+    title="Prueba o pasantía"
+    date={formatFecha(item["Prueba fecha"])}
+    hour={formatHora(item["Prueba hora"])}
+    detail={item["Tipo actividad"]}
+  />
+  <StatusInfoCard
+    title="Entrevista"
+    date={formatFecha(item["Entrevista fecha"])}
+    hour={formatHora(item["Entrevista hora"])}
+    detail={item["Responsable entrevista"]}
+  />
+  <StatusInfoCard
+    title="Inducción"
+    date={formatFecha(item["Inducción fecha"])}
+    hour={formatHora(item["Inducción hora"])}
+    detail="Nuevas familias"
+  />
+</div>
 
       {item.observacion && (
         <div className="rounded-3xl bg-[#F7F8FC] p-5 border border-gray-100">
