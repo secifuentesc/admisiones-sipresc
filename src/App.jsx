@@ -537,13 +537,13 @@ function EmotionalSection() {
           <div
             className="absolute -bottom-6 -left-6 md:-left-10 p-5 rounded-2xl shadow-2xl"
             style={{
-  background: "rgba(255,255,255,0.92)",
+  background: "#FFCC00",
   maxWidth: "200px",
   backdropFilter: "blur(18px)",
   border: "1px solid rgba(255,255,255,0.65)",
 }}
           >
-            <p className="font-black text-2xl" style={{ color: "#FFCC00", fontFamily: "'Montserrat', sans-serif" }}>
+            <p className="font-black text-2xl" style={{ color: "#FFFFFF", fontFamily: "'Montserrat', sans-serif" }}>
               +47
             </p>
             <p className="text-xs font-bold" style={{ color: "#21145F" }}>
