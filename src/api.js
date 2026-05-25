@@ -1,6 +1,7 @@
 // src/api.js
 const API_URL = "/api/proxy";
 
+// Convertir archivo a base64
 const fileToBase64 = (file) => {
   return new Promise((resolve, reject) => {
     const reader = new FileReader();
@@ -10,8 +11,10 @@ const fileToBase64 = (file) => {
   });
 };
 
+// Guardar registro (usa el proxy)
 export async function guardarRegistro(datos) {
   try {
+    // Convertir archivos a base64 solo si existen
     const comprobantePago = datos.comprobantePago ? await fileToBase64(datos.comprobantePago) : null;
     const registroCivil = datos.registroCivil ? await fileToBase64(datos.registroCivil) : null;
     const informeAcademico = datos.informeAcademico ? await fileToBase64(datos.informeAcademico) : null;
@@ -40,11 +43,12 @@ export async function guardarRegistro(datos) {
     console.log("Respuesta del proxy:", resultado);
     return resultado;
   } catch (error) {
-    console.error("Error:", error);
+    console.error("Error guardando registro:", error);
     return { success: false, error: error.message };
   }
 }
 
+// Consultar estado (directo a Apps Script, GET no tiene problemas de CORS)
 export async function consultarEstado(correo, celular) {
   const params = new URLSearchParams();
   params.append("accion", "consultar");
