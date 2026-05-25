@@ -1666,6 +1666,45 @@ function AdmissionStatusModal({ open, onClose }) {
 function AdmissionStatusDetail({ item, onBack, onReset }) {
   const activeIndex = getStepIndex(item.estado);
 
+  function formatFecha(fechaIso) {
+  if (!fechaIso || fechaIso === "Por confirmar" || fechaIso === "") return "Por confirmar";
+  
+  try {
+    const fecha = new Date(fechaIso);
+    // Verificar si la fecha es válida y no es la fecha por defecto de Google Sheets (1899)
+    if (isNaN(fecha.getTime()) || fecha.getFullYear() < 1900) return "Por confirmar";
+    
+    return fecha.toLocaleDateString('es-CO', {
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric'
+    });
+  } catch {
+    return "Por confirmar";
+  }
+}
+
+function formatHora(horaIso) {
+  if (!horaIso || horaIso === "Por confirmar" || horaIso === "") return "Por confirmar";
+  
+  try {
+    // Si es formato ISO (incluye T)
+    if (horaIso.includes("T")) {
+      const fecha = new Date(horaIso);
+      if (isNaN(fecha.getTime())) return horaIso;
+      return fecha.toLocaleTimeString('es-CO', {
+        hour: '2-digit',
+        minute: '2-digit',
+        hour12: true
+      });
+    }
+    // Si ya es texto legible, devolverlo tal cual
+    return horaIso;
+  } catch {
+    return horaIso;
+  }
+}
+
   return (
     <div>
       <div className="mb-7">
