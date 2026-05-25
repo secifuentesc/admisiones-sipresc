@@ -1553,9 +1553,20 @@ const handleSubmit = async () => {
   setSending(true);
   
   try {
+
+    // Calcular tipo de registro final
+let tipoRegistroFinal = data.tipoRegistro;
+
+if (data.tipoRegistro === "openhouse" && data.continuarAdmision === true) {
+  tipoRegistroFinal = "openhouse_admision";
+}
+
+if (data.tipoRegistro === "admision" && data.asistirOpenHouse === true) {
+  tipoRegistroFinal = "admision_openhouse";
+}
     // Preparar datos para enviar
     const datosAEnviar = {
-      tipoRegistro: data.tipoRegistro,
+      tipoRegistro: tipoRegistroFinal,
       correo: data.correo,
       correoOwner: data.correoOwner,
       nombreAspirante: data.nombreAspirante,
