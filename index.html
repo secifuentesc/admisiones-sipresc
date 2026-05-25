@@ -31,6 +31,33 @@
   </head>
   <body>
     <div id="root"></div>
+
+    <script>
+  // Bloquear clic derecho
+  document.addEventListener('contextmenu', function(e) {
+    e.preventDefault();
+    return false;
+  });
+
+  // Bloquear atajos de teclado de desarrollador
+  document.addEventListener('keydown', function(e) {
+    // F12
+    if (e.key === 'F12') {
+      e.preventDefault();
+      return false;
+    }
+    // Ctrl+Shift+I, Ctrl+Shift+C, Ctrl+Shift+J, Ctrl+Shift+K
+    if (e.ctrlKey && e.shiftKey && (e.key === 'I' || e.key === 'C' || e.key === 'J' || e.key === 'K')) {
+      e.preventDefault();
+      return false;
+    }
+    // Ctrl+U (ver código fuente)
+    if (e.ctrlKey && (e.key === 'u' || e.key === 'U')) {
+      e.preventDefault();
+      return false;
+    }
+  });
+</script>
     <script type="module" src="/src/main.jsx"></script>
   </body>
 </html>
