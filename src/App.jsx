@@ -119,12 +119,23 @@ const STATUS_STEPS = [
 function getStepIndex(estado) {
   const value = String(estado || "").toLowerCase();
 
-  if (value.includes("presentación") || value.includes("open house")) return 0;
-  if (value.includes("inscripción")) return 1;
-  if (value.includes("prueba") || value.includes("pasantía")) return 2;
-  if (value.includes("entrevista")) return 3;
-  if (value.includes("resultado") || value.includes("admitido") || value.includes("no admitido")) return 4;
-  if (value.includes("inducción") || value.includes("finalizado")) return 5;
+  // Paso 0: Presentación del colegio / Registro inicial
+  if (value.includes("presentación") || value.includes("open house") || value.includes("registro recibido")) return 0;
+  
+  // Paso 1: Inscripción
+  if (value.includes("inscripción") || value.includes("registro completado")) return 1;
+  
+  // Paso 2: Prueba o pasantía
+  if (value.includes("prueba") || value.includes("pasantía") || value.includes("prueba programada")) return 2;
+  
+  // Paso 3: Entrevista
+  if (value.includes("entrevista") || value.includes("entrevista programada")) return 3;
+  
+  // Paso 4: Resultado
+  if (value.includes("resultado") || value.includes("admitido") || value.includes("no admitido") || value.includes("lista de espera")) return 4;
+  
+  // Paso 5: Inducción / Finalizado
+  if (value.includes("inducción") || value.includes("finalizado") || value.includes("bienvenida")) return 5;
 
   return 0;
 }
