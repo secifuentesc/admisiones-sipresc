@@ -1754,25 +1754,25 @@ function AdmissionStatusDetail({ item, onBack, onReset }) {
         </div>
       </div>
 
-      <div className="grid md:grid-cols-3 gap-4 mb-6">
+            <div className="grid md:grid-cols-3 gap-4 mb-6">
         <StatusInfoCard
           title="Prueba o pasantía"
-          date={item.pruebaFecha}
-          hour={item.pruebaHora}
-          detail={item.tipoActividad}
+          date={item["Prueba fecha"]}
+          hour={item["Prueba hora"]}
+          detail={item["Tipo actividad"]}
         />
 
         <StatusInfoCard
           title="Entrevista"
-          date={item.entrevistaFecha}
-          hour={item.entrevistaHora}
-          detail={item.responsableEntrevista}
+          date={item["Entrevista fecha"]}
+          hour={item["Entrevista hora"]}
+          detail={item["Responsable entrevista"]}
         />
 
         <StatusInfoCard
           title="Inducción"
-          date={item.induccionFecha}
-          hour={item.induccionHora}
+          date={item["Inducción fecha"]}
+          hour={item["Inducción hora"]}
           detail="Nuevas familias"
         />
       </div>
