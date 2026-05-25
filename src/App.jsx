@@ -534,22 +534,20 @@ function EmotionalSection() {
     className="w-full h-full object-cover"
   />
 </div>
-          <div
-            className="absolute -bottom-6 -left-6 md:-left-10 p-5 rounded-2xl shadow-2xl"
-            style={{
-  background: "#0E0A35",
-  maxWidth: "200px",
-  backdropFilter: "blur(18px)",
-  border: "1px solid rgba(255,255,255,0.65)",
-}}
-          >
-            <p className="font-black text-2xl" style={{ color: "#FFFFFF", fontFamily: "'Montserrat', sans-serif" }}>
-              +47
-            </p>
-            <p className="text-xs font-bold" style={{ color: "#21145F" }}>
-              años formando generaciones
-            </p>
-          </div>
+         <div
+  className="absolute -bottom-6 -left-6 md:-left-10 p-5 rounded-2xl shadow-2xl"
+  style={{
+    background: "#0E0A35",
+    maxWidth: "200px",
+  }}
+>
+  <p className="font-black text-2xl" style={{ color: "#FFCC00", fontFamily: "'Montserrat', sans-serif" }}>
+    +47
+  </p>
+  <p className="text-xs font-bold" style={{ color: "rgba(255,255,255,0.5)", fontFamily: "'Poppins', sans-serif" }}>
+    años formando generaciones
+  </p>
+</div>
         </motion.div>
       </div>
     </Section>
