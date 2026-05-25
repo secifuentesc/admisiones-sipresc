@@ -537,7 +537,7 @@ function EmotionalSection() {
           <div
             className="absolute -bottom-6 -left-6 md:-left-10 p-5 rounded-2xl shadow-2xl"
             style={{
-  background: "#1A428A",
+  background: "#0E0A35",
   maxWidth: "200px",
   backdropFilter: "blur(18px)",
   border: "1px solid rgba(255,255,255,0.65)",
