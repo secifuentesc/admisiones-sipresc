@@ -1583,6 +1583,12 @@ const handleSubmit = async () => {
       numeroAsistentes: data.numeroAsistentes,
       nombresAsistentes: data.nombresAsistentes,
       continuarAdmision: data.continuarAdmision,
+      /** ✅ AGREGAR ESTAS 5 LÍNEAS ✅ */
+      comprobantePago: files.comprobantePago,
+      registroCivil: files.registroCivil,
+      informeAcademico: files.informeAcademico,
+      fichaSeguimiento: files.fichaSeguimiento,
+      pazYSalvo: files.pazYSalvo
     };
     
     await guardarRegistro(datosAEnviar);
