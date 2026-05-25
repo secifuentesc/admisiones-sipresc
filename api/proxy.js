@@ -1,10 +1,11 @@
 // api/proxy.js
 export default async function handler(req, res) {
-  // Habilitar CORS
+  // Habilitar CORS para la respuesta
   res.setHeader("Access-Control-Allow-Origin", "*");
   res.setHeader("Access-Control-Allow-Methods", "POST, OPTIONS");
   res.setHeader("Access-Control-Allow-Headers", "Content-Type");
 
+  // Responder a preflight (OPTIONS)
   if (req.method === "OPTIONS") {
     return res.status(200).end();
   }
@@ -24,6 +25,6 @@ export default async function handler(req, res) {
     res.status(200).json(data);
   } catch (error) {
     console.error("Proxy error:", error);
-    res.status(200).json({ success: true, error: error.message });
+    res.status(200).json({ success: false, error: error.message });
   }
 }
