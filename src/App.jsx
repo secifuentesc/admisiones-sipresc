@@ -283,12 +283,12 @@ function Hero() {
         className="fixed top-0 left-0 right-0 z-50 px-5 md:px-12 py-6"
       >
         <div
-          className={`relative mx-auto max-w-7xl h-12 flex items-center justify-between transition-all duration-500 ${
-            scrolled
-              ? "rounded-full bg-white/90 backdrop-blur-xl px-5 shadow-[0_18px_60px_rgba(0,0,0,0.12)]"
-              : ""
-          }`}
-        >
+  className={`relative mx-auto max-w-7xl flex items-center justify-between gap-2 transition-all duration-500 ${
+    scrolled
+      ? "rounded-full bg-white/90 backdrop-blur-xl px-5 py-2 shadow-[0_18px_60px_rgba(0,0,0,0.12)]"
+      : "py-0"
+  }`}
+>
           {/* Izquierda superior */}
           <a
             href={FORM_URL}
@@ -355,23 +355,24 @@ function Hero() {
           </a>
 
           {/* Derecha superior */}
+
           <a
-            href="#openhouse"
-            className={`inline-flex items-center gap-2 rounded-full px-4 py-2 text-xs font-bold tracking-wide transition-all duration-500 ${
-              scrolled
-                ? "bg-[#F7F8FC] text-[#21145F]"
-                : "bg-white/[0.14] text-white border border-white/35 backdrop-blur-md"
-            }`}
-            style={{
-              fontFamily: "'Montserrat', sans-serif",
-              textShadow: scrolled ? "none" : "0 8px 24px rgba(0,0,0,0.35)",
-            }}
-          >
-            <span className="hidden sm:inline">Open House</span>
-            <span className="sm:hidden">Open</span>
-            <span className={scrolled ? "text-[#1A428A]/60" : "text-white/45"}>·</span>
-            <span>11 julio</span>
-          </a>
+  href="#openhouse"
+  className={`inline-flex items-center gap-1 md:gap-2 rounded-full px-3 md:px-4 py-1 md:py-2 text-[10px] md:text-xs font-bold tracking-wide transition-all duration-500 ${
+    scrolled
+      ? "bg-[#F7F8FC] text-[#21145F]"
+      : "bg-white/[0.14] text-white border border-white/35 backdrop-blur-md"
+  }`}
+  style={{
+    fontFamily: "'Montserrat', sans-serif",
+    textShadow: scrolled ? "none" : "0 8px 24px rgba(0,0,0,0.35)",
+  }}
+>
+  <span className="hidden sm:inline">Open House</span>
+  <span className="sm:hidden">OH</span>
+  <span className={scrolled ? "text-[#1A428A]/60" : "text-white/45"}>·</span>
+  <span>11 jul</span>
+</a>
         </div>
       </motion.header>
 
