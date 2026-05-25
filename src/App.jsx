@@ -1671,10 +1671,11 @@ function AdmissionStatusDetail({ item, onBack, onReset }) {
   
   try {
     const fecha = new Date(fechaIso);
-    // Verificar si la fecha es válida y no es la fecha por defecto de Google Sheets (1899)
     if (isNaN(fecha.getTime()) || fecha.getFullYear() < 1900) return "Por confirmar";
     
+    // ✅ NUEVO: Incluye el día de la semana
     return fecha.toLocaleDateString('es-CO', {
+      weekday: 'long',
       year: 'numeric',
       month: 'long',
       day: 'numeric'
