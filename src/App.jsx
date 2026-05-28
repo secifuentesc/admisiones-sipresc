@@ -266,7 +266,7 @@ function Hero() {
           playsInline
           preload="auto"
         >
-          <source src="/videos/admisiones-hero.mp4" type="video/mp4" />
+          <source src="https://res.cloudinary.com/dmfm1r8ar/video/upload/q_auto,f_auto/v1779986251/0528_1_lgkebw.mp4" type="video/mp4"/>
         </video>
 
         {/* Overlay cinematográfico más suave para que el video se vea */}
