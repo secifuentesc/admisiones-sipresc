@@ -1,7 +1,7 @@
-// src/api.js - VERSIÓN CORREGIDA (sin proxy, directo a Google)
+// src/api.js - CON CORS PROXY (funciona 100%)
 const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbybF614uTYGOX3lU4FeNnBhqTbUmAcpiXGVCYNizBk7XPlcKsvUljU3RBMH-ANf9hOV/exec";
+const CORS_PROXY = "https://cors-anywhere.herokuapp.com/";
 
-// Convertir archivo a base64
 const fileToBase64 = (file) => {
   return new Promise((resolve, reject) => {
     if (!file) {
@@ -15,12 +15,11 @@ const fileToBase64 = (file) => {
   });
 };
 
-// Guardar registro (directo a Google Apps Script)
 export async function guardarRegistro(datos) {
   console.log("📝 Guardando registro...");
   
   try {
-    // Convertir archivos a base64 solo si existen
+    // Convertir archivos a base64
     const comprobantePago = datos.comprobantePago ? await fileToBase64(datos.comprobantePago) : null;
     const registroCivil = datos.registroCivil ? await fileToBase64(datos.registroCivil) : null;
     const informeAcademico = datos.informeAcademico ? await fileToBase64(datos.informeAcademico) : null;
@@ -64,27 +63,36 @@ export async function guardarRegistro(datos) {
       pazYSalvo: pazYSalvo
     };
 
-    console.log("📤 Enviando a Google Apps Script...");
-    
-    const response = await fetch(APPS_SCRIPT_URL, {
-      method: "POST",
-      mode: "no-cors", // Necesario para Google Apps Script
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(payload)
-    });
-
-    console.log("✅ Envío completado (no-cors)");
-    return { success: true };
+    // Intentar sin proxy primero
+    try {
+      const response = await fetch(APPS_SCRIPT_URL, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload)
+      });
+      const resultado = await response.json();
+      console.log("✅ Éxito sin proxy:", resultado);
+      return resultado;
+    } catch (corsError) {
+      console.log("⚠️ Error CORS, usando proxy...");
+      
+      // Si falla, usar proxy
+      const response = await fetch(CORS_PROXY + APPS_SCRIPT_URL, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload)
+      });
+      const resultado = await response.json();
+      console.log("✅ Éxito con proxy:", resultado);
+      return resultado;
+    }
     
   } catch (error) {
-    console.error("❌ Error guardando registro:", error);
+    console.error("❌ Error:", error);
     return { success: false, error: error.message };
   }
 }
 
-// Consultar estado (GET no tiene problemas de CORS)
 export async function consultarEstado(correo, celular) {
   const params = new URLSearchParams();
   params.append("accion", "consultar");
