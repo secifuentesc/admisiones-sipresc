@@ -1370,7 +1370,7 @@ function Final({ data, modo }) {
             El equipo de admisiones revisará tu registro y se comunicará a través de los correos y celulares registrados.
           </p>
 
-          <a href="/admisiones" style={{
+          <a href="https://admisiones.sipresc.co" style={{
             all:"unset", cursor:"pointer",
             fontFamily:"'Montserrat', sans-serif", fontWeight:700,
             fontSize:"0.82rem", letterSpacing:"0.1em", textTransform:"uppercase",
