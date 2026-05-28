@@ -211,7 +211,7 @@ function Topbar({ stepIdx, totalSteps, tipoRegistro }) {
         display:"flex", alignItems:"center", justifyContent:"space-between",
       }}>
         {/* Logo */}
-        <a href="/admisiones" style={{ display:"flex", alignItems:"center", gap:"12px", textDecoration:"none" }}>
+        <a href="https://admisiones.sipresc.co" style={{ display:"flex", alignItems:"center", gap:"12px", textDecoration:"none" }}>
           <div style={{
             fontFamily:"'CollegiateBlackFLF', serif",
             fontSize:"2rem", lineHeight:"0.82",
@@ -255,7 +255,7 @@ function Topbar({ stepIdx, totalSteps, tipoRegistro }) {
               color: C.dark,
             }}>{stepLabel}</span>
           )}
-          <a href="/admisiones" style={{
+          <a href="https://admisiones.sipresc.co" style={{
             fontFamily:"'Montserrat', sans-serif",
             fontSize:"0.68rem", fontWeight:600,
             color: C.muted, textDecoration:"none",
