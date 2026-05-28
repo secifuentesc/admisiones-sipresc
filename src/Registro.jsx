@@ -575,7 +575,7 @@ function StepTipo({ data, setData }) {
               <p style={{ fontFamily:"'Montserrat', sans-serif", fontSize:"0.58rem", fontWeight:700, color:"rgba(255,255,255,0.4)", letterSpacing:"0.2em", textTransform:"uppercase", marginBottom:"0.5rem" }}>Pago previo al registro</p>
               <p style={{ fontFamily:"'Montserrat', sans-serif", fontWeight:900, fontSize:"2.2rem", color:C.white, lineHeight:1, marginBottom:"0.75rem" }}>$40.000</p>
               <p style={{ fontFamily:"'Poppins', sans-serif", fontSize:"0.8rem", color:"rgba(255,255,255,0.5)", lineHeight:1.6 }}>
-                Cuenta de ahorros Bancolombia a nombre del<br/>
+                Cuenta de ahorros Bancolombia No. 39900005178 a nombre de <br/>
                 <strong style={{ color:C.white }}>Instituto Parroquial Nuestra Señora de la Presentación</strong>
               </p>
               <div style={{ height:"1px", background:"rgba(255,255,255,0.08)", margin:"1rem 0" }} />
@@ -1024,7 +1024,7 @@ function StepPago({ files, setFiles }) {
         <p style={{ fontFamily:"'Montserrat', sans-serif", fontSize:"0.58rem", fontWeight:700, color:"rgba(255,255,255,0.4)", letterSpacing:"0.2em", textTransform:"uppercase", marginBottom:"0.4rem" }}>Valor</p>
         <p style={{ fontFamily:"'Montserrat', sans-serif", fontWeight:900, fontSize:"2.4rem", color:C.white, lineHeight:1, marginBottom:"0.75rem" }}>$40.000</p>
         <p style={{ fontFamily:"'Poppins', sans-serif", fontSize:"0.78rem", color:"rgba(255,255,255,0.45)", lineHeight:1.6 }}>
-          Cuenta de ahorros Bancolombia<br/>
+          Cuenta de ahorros Bancolombia No. 39900005178 a nombre de <br/>
           <strong style={{ color:C.white }}>Instituto Parroquial Nuestra Señora de la Presentación</strong>
         </p>
       </div>
