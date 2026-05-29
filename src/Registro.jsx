@@ -447,7 +447,7 @@ function FChip({ label, selected, onClick, sub }) {
   );
 }
 
-function FFile({ label, fieldKey, files, setFiles, required, maxMB = 10, datosAspirante }) {
+function FFile({ label, fieldKey, files, setFiles, required, maxMB = 30, datosAspirante }) {
   const id = `file-${fieldKey}`;
   const file = files[fieldKey];
   const [error, setError] = useState("");
