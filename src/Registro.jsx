@@ -447,63 +447,117 @@ function FChip({ label, selected, onClick, sub }) {
   );
 }
 
-function FFile({ label, fieldKey, files, setFiles, required, maxMB = 50 }) {
+function FFile({ label, fieldKey, files, setFiles, required, maxMB = 10, datosAspirante }) {
   const id = `file-${fieldKey}`;
   const file = files[fieldKey];
   const [error, setError] = useState("");
+  const [uploading, setUploading] = useState(false);
+  const [uploaded, setUploaded] = useState(false);
 
-  const handleChange = (e) => {
+  // Si ya tiene link guardado, marcarlo como subido
+  useEffect(() => {
+    if (files[`${fieldKey}_link`]) setUploaded(true);
+  }, []);
+
+  const handleChange = async (e) => {
     const f = e.target.files[0];
     if (!f) return;
+
+    // Validar tamaño
     if (f.size > maxMB * 1024 * 1024) {
-      setError(`El archivo supera el límite de ${maxMB}MB`);
+      setError(`El archivo supera el límite de ${maxMB}MB. Por favor comprime el documento e intenta de nuevo.`);
       return;
     }
+
+    // Validar tipo
+    const tiposValidos = ['application/pdf', 'image/jpeg', 'image/jpg', 'image/png'];
+    if (!tiposValidos.includes(f.type) && !f.name.match(/\.(pdf|jpg|jpeg|png)$/i)) {
+      setError("Solo se permiten archivos PDF, JPG o PNG.");
+      return;
+    }
+
     setError("");
-    setFiles(p => ({ ...p, [fieldKey]: f }));
+    setUploaded(false);
+    setFiles(p => ({ ...p, [fieldKey]: f, [`${fieldKey}_link`]: null }));
+    setUploading(true);
+
+    try {
+      const resultado = await subirArchivoADrive(f, fieldKey, datosAspirante);
+
+      if (resultado.success) {
+        setFiles(p => ({ ...p, [fieldKey]: f, [`${fieldKey}_link`]: resultado.link }));
+        setUploaded(true);
+        setError("");
+      } else {
+        setError("No se pudo subir el archivo. Toca aquí para intentar de nuevo.");
+        setFiles(p => ({ ...p, [fieldKey]: null, [`${fieldKey}_link`]: null }));
+        setUploaded(false);
+      }
+    } catch(e) {
+      setError("Error de conexión. Toca aquí para intentar de nuevo.");
+      setFiles(p => ({ ...p, [fieldKey]: null, [`${fieldKey}_link`]: null }));
+      setUploaded(false);
+    } finally {
+      setUploading(false);
+    }
   };
 
   return (
-    <div style={{ marginBottom: "1.2rem", background: C.white, border: `2px solid ${file ? C.success : C.line}`, borderRadius: "18px", padding: "1.4rem 1.5rem", transition: "border-color 0.2s, box-shadow 0.2s", boxShadow: file ? "0 0 0 4px rgba(16,185,129,0.08)" : "0 1px 8px rgba(33,20,95,0.05)" }}>
+    <div style={{ marginBottom: "1.2rem", background: C.white, border: `2px solid ${uploaded ? C.success : error ? "#EF4444" : uploading ? C.accent : C.line}`, borderRadius: "18px", padding: "1.4rem 1.5rem", transition: "border-color 0.2s, box-shadow 0.2s", boxShadow: uploaded ? "0 0 0 4px rgba(16,185,129,0.08)" : error ? "0 0 0 4px rgba(239,68,68,0.08)" : "0 1px 8px rgba(33,20,95,0.05)" }}>
       <div style={{ display: "flex", alignItems: "flex-start", gap: "1rem" }}>
-        <div style={{ width: "36px", height: "36px", borderRadius: "10px", flexShrink: 0, background: file ? C.success : C.panel, display: "flex", alignItems: "center", justifyContent: "center", transition: "background 0.2s" }}>
-          {file ? (
-            <svg width="16" height="16" viewBox="0 0 20 20" fill="none"><path d="M4 10l4 4 8-8" stroke="#fff" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" /></svg>
-          ) : (
-  <svg width="16" height="16" viewBox="0 0 20 20" fill="none" stroke={C.accent} strokeWidth="1.8" strokeLinecap="round">
-    <path d="M6 2h8l4 4v12a2 2 0 01-2 2H6a2 2 0 01-2-2V4a2 2 0 012-2z" />
-    <path d="M14 2v4h4" />
-  </svg>
-)}
+        <div style={{ width: "36px", height: "36px", borderRadius: "10px", flexShrink: 0, background: uploaded ? C.success : error ? "#EF4444" : uploading ? C.accent : C.panel, display: "flex", alignItems: "center", justifyContent: "center", transition: "background 0.2s" }}>
+          {uploaded && <svg width="16" height="16" viewBox="0 0 20 20" fill="none"><path d="M4 10l4 4 8-8" stroke="#fff" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" /></svg>}
+          {uploading && <span style={{ color: "#fff", fontSize: "0.7rem", fontWeight: 700 }}>...</span>}
+          {!uploaded && !uploading && !error && (
+            <svg width="16" height="16" viewBox="0 0 20 20" fill="none" stroke={C.accent} strokeWidth="1.8" strokeLinecap="round">
+              <path d="M6 2h8l4 4v12a2 2 0 01-2 2H6a2 2 0 01-2-2V4a2 2 0 012-2z" />
+              <path d="M14 2v4h4" />
+            </svg>
+          )}
+          {error && <span style={{ color: "#fff", fontSize: "1rem", fontWeight: 700 }}>!</span>}
         </div>
+
         <div style={{ flex: 1, minWidth: 0 }}>
           <div style={{ display: "flex", alignItems: "center", gap: "8px", flexWrap: "wrap", marginBottom: "0.25rem" }}>
             <p style={{ fontFamily: "'Montserrat', sans-serif", fontSize: "1rem", fontWeight: 800, color: C.dark, lineHeight: 1.3 }}>{label}</p>
             <span style={{ fontFamily: "'Montserrat', sans-serif", fontSize: "0.55rem", fontWeight: 700, letterSpacing: "0.14em", textTransform: "uppercase", color: required ? C.accent : C.muted, background: required ? C.panel : "#F3F4F6", padding: "0.18rem 0.55rem", borderRadius: "999px", border: required ? `1px solid rgba(26,66,138,0.2)` : "1px solid #E5E7EB" }}>{required ? "Requerido" : "Opcional"}</span>
           </div>
-          {!file ? (
-            <label htmlFor={id} style={{ display: "flex", alignItems: "center", gap: "10px", cursor: "pointer", background: C.bg, border: `2px dashed ${C.line}`, borderRadius: "12px", padding: "0.8rem 1rem", transition: "border-color 0.15s" }}>
+
+          {/* Estado: sin archivo */}
+          {!file && !uploading && (
+            <label htmlFor={id} style={{ display: "flex", alignItems: "center", gap: "10px", cursor: "pointer", background: C.bg, border: `2px dashed ${error ? "#EF4444" : C.line}`, borderRadius: "12px", padding: "0.8rem 1rem", transition: "border-color 0.15s" }}>
               <svg width="16" height="16" viewBox="0 0 20 20" fill="none" stroke={C.muted} strokeWidth="1.8" strokeLinecap="round"><path d="M10 13V3m-4 4l4-4 4 4" /><path d="M3 17h14" /></svg>
-              <span style={{ fontFamily: "'Poppins', sans-serif", fontSize: "0.8rem", color: C.muted }}>Subir archivo — PDF, JPG o PNG · máx. 50MB</span>
+              <span style={{ fontFamily: "'Poppins', sans-serif", fontSize: "0.8rem", color: error ? "#EF4444" : C.muted }}>
+                {error ? error : `Subir archivo — PDF, JPG o PNG · máx. ${maxMB}MB`}
+              </span>
             </label>
-          ) : (
+          )}
+
+          {/* Estado: subiendo */}
+          {uploading && (
+            <div style={{ display: "flex", alignItems: "center", gap: "10px", background: C.panel, border: `1.5px solid ${C.lineHov}`, borderRadius: "12px", padding: "0.75rem 1rem" }}>
+              <svg width="16" height="16" viewBox="0 0 20 20" fill="none" stroke={C.accent} strokeWidth="1.8" strokeLinecap="round"><path d="M10 13V3m-4 4l4-4 4 4" /><path d="M3 17h14" /></svg>
+              <p style={{ fontFamily: "'Poppins', sans-serif", fontSize: "0.8rem", color: C.accent, fontWeight: 600 }}>Subiendo archivo, por favor espera...</p>
+            </div>
+          )}
+
+          {/* Estado: subido exitosamente */}
+          {uploaded && file && !uploading && (
             <div style={{ display: "flex", alignItems: "center", gap: "10px", background: "#F0FDF4", border: "1.5px solid #86EFAC", borderRadius: "12px", padding: "0.75rem 1rem" }}>
               <svg width="16" height="16" viewBox="0 0 20 20" fill="none" stroke="#16A34A" strokeWidth="1.8" strokeLinecap="round"><path d="M14 2H6a2 2 0 00-2 2v12a2 2 0 002 2h8a2 2 0 002-2V4a2 2 0 00-2-2z" /><path d="M8 10h4M8 13h2" /></svg>
               <div style={{ flex: 1, minWidth: 0 }}>
                 <p style={{ fontFamily: "'Poppins', sans-serif", fontSize: "0.8rem", fontWeight: 600, color: "#166534", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{file.name}</p>
-                <p style={{ fontFamily: "'Poppins', sans-serif", fontSize: "0.7rem", color: "#4ADE80" }}>{(file.size / 1024 / 1024).toFixed(1)} MB</p>
+                <p style={{ fontFamily: "'Poppins', sans-serif", fontSize: "0.7rem", color: "#4ADE80" }}>✓ Guardado correctamente · {(file.size / 1024 / 1024).toFixed(1)} MB</p>
               </div>
-              <button onClick={e => { e.preventDefault(); setFiles(p => ({ ...p, [fieldKey]: null })); }} style={{ all: "unset", cursor: "pointer", color: "#86EFAC", fontSize: "1.2rem", lineHeight: 1, fontWeight: 700 }}>×</button>
+              <button onClick={e => { e.preventDefault(); setFiles(p => ({ ...p, [fieldKey]: null, [`${fieldKey}_link`]: null })); setUploaded(false); setError(""); }} style={{ all: "unset", cursor: "pointer", color: "#86EFAC", fontSize: "1.2rem", lineHeight: 1, fontWeight: 700 }}>×</button>
             </div>
           )}
-          {error && <p style={{ fontFamily: "'Poppins', sans-serif", fontSize: "0.72rem", color: "#EF4444", marginTop: "0.4rem" }}>{error}</p>}
         </div>
       </div>
       <input id={id} type="file" accept=".pdf,.jpg,.jpeg,.png" style={{ display: "none" }} onChange={handleChange} />
     </div>
   );
 }
-
 // ─── STEP TITLE ───────────────────────────────────────────────────────────────
 function StepTitle({ badge, title, sub }) {
   return (
