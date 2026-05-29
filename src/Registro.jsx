@@ -1551,20 +1551,12 @@ export default function Registro() {
 // Reemplaza la función handleSubmit existente
 const handleSubmit = async () => {
   setSending(true);
-  
+
   try {
+    let tipoRegistroFinal = data.tipoRegistro;
+    if (data.tipoRegistro === "openhouse" && data.continuarAdmision === true) tipoRegistroFinal = "openhouse_admision";
+    if (data.tipoRegistro === "admision" && data.asistirOpenHouse === true) tipoRegistroFinal = "admision_openhouse";
 
-    // Calcular tipo de registro final
-let tipoRegistroFinal = data.tipoRegistro;
-
-if (data.tipoRegistro === "openhouse" && data.continuarAdmision === true) {
-  tipoRegistroFinal = "openhouse_admision";
-}
-
-if (data.tipoRegistro === "admision" && data.asistirOpenHouse === true) {
-  tipoRegistroFinal = "admision_openhouse";
-}
-    // Preparar datos para enviar
     const datosAEnviar = {
       tipoRegistro: tipoRegistroFinal,
       correo: data.correo,
@@ -1594,23 +1586,29 @@ if (data.tipoRegistro === "admision" && data.asistirOpenHouse === true) {
       numeroAsistentes: data.numeroAsistentes,
       nombresAsistentes: data.nombresAsistentes,
       continuarAdmision: data.continuarAdmision,
-      /** ✅ AGREGAR ESTAS 5 LÍNEAS ✅ */
       comprobantePago: files.comprobantePago,
       registroCivil: files.registroCivil,
       informeAcademico: files.informeAcademico,
       fichaSeguimiento: files.fichaSeguimiento,
-      pazYSalvo: files.pazYSalvo
+      pazYSalvo: files.pazYSalvo,
     };
-    
-    await guardarRegistro(datosAEnviar);
-    
-    // Limpiar localStorage
-    try { if (data.correo) localStorage.removeItem(`registro_${data.correo}`); } catch(e) {}
-    
-    setPhase("done");
+
+    const resultado = await guardarRegistro(datosAEnviar);
+
+    if (resultado.success) {
+      try { localStorage.removeItem(`registro_${data.correo}`); } catch(e) {}
+      setPhase("done");
+    } else {
+      if (resultado.error?.includes("Ya existe")) {
+        setPhase("duplicado");
+      } else {
+        setPhase("error");
+      }
+    }
+
   } catch (error) {
     console.error("Error al enviar:", error);
-    alert("Hubo un error al enviar el registro. Por favor, intenta de nuevo.");
+    setPhase("error");
   } finally {
     setSending(false);
   }
@@ -1637,6 +1635,59 @@ if (data.tipoRegistro === "admision" && data.asistirOpenHouse === true) {
     if (id === "resumen") return <StepResumen data={data} files={files} modo={modo} />;
     return null;
   };
+
+  if (phase === "duplicado") return (
+  <>
+    <style>{FONTS}</style>
+    <Topbar stepIdx={0} totalSteps={0} tipoRegistro={null} />
+    <div style={{ minHeight:"100vh", background:C.bg, display:"flex", alignItems:"center", justifyContent:"center", padding:"2rem" }}>
+      <div style={{ maxWidth:"480px", width:"100%", textAlign:"center" }}>
+        <div style={{ fontSize:"3rem", marginBottom:"1.5rem" }}>📋</div>
+        <h2 style={{ fontFamily:"'Montserrat', sans-serif", fontWeight:800, fontSize:"1.6rem", color:C.dark, marginBottom:"1rem" }}>
+          Ya tienes un registro
+        </h2>
+        <p style={{ fontFamily:"'Poppins', sans-serif", fontSize:"0.9rem", color:C.muted, lineHeight:1.7, marginBottom:"1.5rem" }}>
+          Ya existe un registro con el correo <strong style={{ color:C.dark }}>{data.correo}</strong>. Si crees que es un error, escríbenos.
+        </p>
+        <a href="https://admisiones.sipresc.co" style={{ all:"unset", cursor:"pointer", background:C.dark, color:C.white, fontFamily:"'Montserrat', sans-serif", fontWeight:700, fontSize:"0.82rem", padding:"0.9rem 2rem", borderRadius:"999px", display:"inline-block" }}>
+          Volver a admisiones
+        </a>
+      </div>
+    </div>
+  </>
+);
+
+if (phase === "error") return (
+  <>
+    <style>{FONTS}</style>
+    <Topbar stepIdx={0} totalSteps={0} tipoRegistro={null} />
+    <div style={{ minHeight:"100vh", background:C.bg, display:"flex", alignItems:"center", justifyContent:"center", padding:"2rem" }}>
+      <div style={{ maxWidth:"480px", width:"100%", textAlign:"center" }}>
+        <div style={{ fontSize:"3rem", marginBottom:"1.5rem" }}>⚠️</div>
+        <h2 style={{ fontFamily:"'Montserrat', sans-serif", fontWeight:800, fontSize:"1.6rem", color:C.dark, marginBottom:"1rem" }}>
+          Hubo un problema al enviar
+        </h2>
+        <p style={{ fontFamily:"'Poppins', sans-serif", fontSize:"0.9rem", color:C.muted, lineHeight:1.7, marginBottom:"0.5rem" }}>
+          Tu información está guardada en este dispositivo. Intenta de nuevo o escríbenos directamente:
+        </p>
+        <p style={{ fontFamily:"'Montserrat', sans-serif", fontWeight:700, fontSize:"0.9rem", color:C.accent, marginBottom:"1.5rem" }}>
+          admisiones@lapresentaciongirardota.edu.co
+        </p>
+        <div style={{ display:"flex", gap:"10px", justifyContent:"center", flexWrap:"wrap" }}>
+          <button
+            onClick={() => { setPhase("form"); setSending(false); }}
+            style={{ all:"unset", cursor:"pointer", background:C.dark, color:C.white, fontFamily:"'Montserrat', sans-serif", fontWeight:700, fontSize:"0.82rem", padding:"0.9rem 2rem", borderRadius:"999px" }}
+          >
+            Intentar de nuevo
+          </button>
+          <a href="https://admisiones.sipresc.co" style={{ all:"unset", cursor:"pointer", background:C.bg, color:C.body, fontFamily:"'Montserrat', sans-serif", fontWeight:600, fontSize:"0.82rem", padding:"0.9rem 2rem", borderRadius:"999px", border:`1px solid ${C.line}` }}>
+            Volver
+          </a>
+        </div>
+      </div>
+    </div>
+  </>
+);
 
   if (phase === "done") return (
     <>
