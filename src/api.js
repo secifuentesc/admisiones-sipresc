@@ -5,7 +5,11 @@ const fileToBase64 = (file) => {
   return new Promise((resolve, reject) => {
     if (!file) { resolve(null); return; }
     const reader = new FileReader();
-    reader.onload = () => resolve(reader.result.split(",")[1]);
+    reader.onload = () => resolve({
+      base64: reader.result.split(",")[1],
+      tipo: file.type,
+      nombre: file.name,
+    });
     reader.onerror = reject;
     reader.readAsDataURL(file);
   });
