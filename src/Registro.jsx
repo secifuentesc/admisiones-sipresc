@@ -1907,6 +1907,12 @@ const handleSubmit = async () => {
     return null;
   };
 
+  if (sending) return (
+  <AnimatePresence>
+    <SendingScreen />
+  </AnimatePresence>
+);
+
   if (phase === "duplicado") return (
   <>
     <style>{FONTS}</style>
