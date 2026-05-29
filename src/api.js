@@ -156,6 +156,63 @@ export async function guardarRegistro(datos) {
   }
 }
 
+export async function subirArchivoADrive(file, fieldKey, datosAspirante) {
+  const MAX_INTENTOS = 3;
+  let ultimoError = null;
+
+  const fileData = await fileToBase64(file);
+
+  const payload = {
+    accion: "subirArchivo",
+    base64: fileData.base64,
+    tipo: fileData.tipo,
+    nombre: `${fieldKey}_${datosAspirante.apellidosAspirante}_${datosAspirante.nombreAspirante}.${fileData.tipo.includes('pdf') ? 'pdf' : fileData.tipo.includes('png') ? 'png' : 'jpg'}`,
+    nombreAspirante: datosAspirante.nombreAspirante,
+    apellidosAspirante: datosAspirante.apellidosAspirante,
+    correo: datosAspirante.correo,
+  };
+
+  for (let intento = 1; intento <= MAX_INTENTOS; intento++) {
+    try {
+      console.log(`📤 Subiendo ${fieldKey} — intento ${intento} de ${MAX_INTENTOS}...`);
+
+      const controller = new AbortController();
+      const timeout = setTimeout(() => controller.abort(), 30000);
+
+      const response = await fetch(APPS_SCRIPT_URL, {
+        method: "POST",
+        headers: { "Content-Type": "text/plain" },
+        body: JSON.stringify(payload),
+        redirect: "follow",
+        signal: controller.signal,
+      });
+
+      clearTimeout(timeout);
+
+      const text = await response.text();
+      const resultado = JSON.parse(text);
+
+      if (resultado.success) {
+        console.log(`✅ ${fieldKey} subido correctamente`);
+        return resultado;
+      }
+
+      ultimoError = resultado.error || "Error desconocido";
+      console.warn(`⚠️ Intento ${intento} fallido:`, ultimoError);
+
+    } catch(err) {
+      ultimoError = err.message;
+      console.warn(`⚠️ Intento ${intento} con excepción:`, err.message);
+      if (intento < MAX_INTENTOS) {
+        await new Promise(r => setTimeout(r, intento * 1000));
+      }
+    }
+  }
+
+  console.error(`❌ No se pudo subir ${fieldKey}:`, ultimoError);
+  return { success: false, error: ultimoError };
+}
+
 export async function consultarEstado(correo, celular) {
   const params = new URLSearchParams();
   params.append("accion", "consultar");
