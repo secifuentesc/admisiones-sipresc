@@ -656,13 +656,13 @@ function StepCorreo({ data, setData, onProgressRestore }) {
     if (!data.correo) return;
     setChecking(true);
     setTimeout(() => {
-      const saved = localStorage.getItem(`registro_${data.correo}`);
-      if (saved) {
-        try {
+      try {
+        const saved = localStorage.getItem(`registro_${data.correo}`);
+        if (saved) {
           const parsed = JSON.parse(saved);
           if (parsed && parsed.stepIdx > 0) onProgressRestore(parsed);
-        } catch {}
-      }
+        }
+      } catch(e) {}
       setChecking(false);
     }, 400);
   };
@@ -1429,7 +1429,7 @@ export default function Registro() {
   // Guardado local
   useEffect(() => {
     if (data.correo && stepIdx > 0) {
-      localStorage.setItem(`registro_${data.correo}`, JSON.stringify({ data, stepIdx }));
+      try { localStorage.setItem(`registro_${data.correo}`, JSON.stringify({ data, stepIdx })); } catch(e) {}
     }
   }, [data, stepIdx]);
 
@@ -1605,7 +1605,7 @@ if (data.tipoRegistro === "admision" && data.asistirOpenHouse === true) {
     await guardarRegistro(datosAEnviar);
     
     // Limpiar localStorage
-    if (data.correo) localStorage.removeItem(`registro_${data.correo}`);
+    try { if (data.correo) localStorage.removeItem(`registro_${data.correo}`); } catch(e) {}
     
     setPhase("done");
   } catch (error) {
