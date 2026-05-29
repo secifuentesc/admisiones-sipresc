@@ -558,6 +558,218 @@ function FFile({ label, fieldKey, files, setFiles, required, maxMB = 30, datosAs
     </div>
   );
 }
+
+// ─── SENDING SCREEN ──────────────────────────────────────────────────────────
+const SENDING_MESSAGES = [
+  "Estamos registrando la información de tu familia...",
+  "Guardando los documentos en Drive...",
+  "Casi listo, un momento más...",
+  "Verificando que todo esté bien...",
+  "Preparando la confirmación...",
+];
+
+function SendingScreen() {
+  const [msgIdx, setMsgIdx] = useState(0);
+
+  useEffect(() => {
+    const id = setInterval(() => {
+      setMsgIdx(i => (i + 1) % SENDING_MESSAGES.length);
+    }, 2800);
+    return () => clearInterval(id);
+  }, []);
+
+  return (
+    <motion.div
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      exit={{ opacity: 0 }}
+      style={{
+        position: "fixed", inset: 0, zIndex: 999,
+        background: "linear-gradient(135deg, #0E0A35 0%, #21145F 60%, #0E0A35 100%)",
+        display: "flex", alignItems: "center", justifyContent: "center",
+        fontFamily: "'Poppins', sans-serif",
+        overflow: "hidden",
+      }}
+    >
+      {/* Glows */}
+      <div style={{ position:"absolute", width:500, height:500, borderRadius:"50%", background:"rgba(26,66,138,0.18)", top:-150, left:-150, filter:"blur(60px)" }} />
+      <div style={{ position:"absolute", width:400, height:400, borderRadius:"50%", background:"rgba(255,204,0,0.07)", bottom:-100, right:-100, filter:"blur(60px)" }} />
+
+      <div style={{ position:"relative", zIndex:10, textAlign:"center", padding:"2rem", maxWidth:400, width:"100%" }}>
+
+        {/* Bee */}
+        <div style={{ position:"relative", width:140, height:140, margin:"0 auto 2.5rem" }}>
+          <motion.div
+            animate={{ rotate: 360 }}
+            transition={{ duration: 10, repeat: Infinity, ease: "linear" }}
+            style={{
+              position:"absolute", inset:0, borderRadius:"50%",
+              border:"1.5px solid rgba(255,204,0,0.15)",
+            }}
+          >
+            <div style={{
+              position:"absolute", top:-5, left:"50%", transform:"translateX(-50%)",
+              width:10, height:10, borderRadius:"50%", background:"#FFCC00",
+              boxShadow:"0 0 16px 4px rgba(255,204,0,0.6)",
+            }} />
+          </motion.div>
+
+          <motion.div
+            animate={{ rotate: -360 }}
+            transition={{ duration: 6, repeat: Infinity, ease: "linear" }}
+            style={{
+              position:"absolute", inset:10, borderRadius:"50%",
+              border:"1px solid rgba(255,255,255,0.06)",
+            }}
+          >
+            <div style={{
+              position:"absolute", bottom:-4, left:"50%", transform:"translateX(-50%)",
+              width:7, height:7, borderRadius:"50%", background:"rgba(255,255,255,0.3)",
+            }} />
+          </motion.div>
+
+          <div style={{
+            position:"absolute", inset:18, borderRadius:"50%",
+            background:"radial-gradient(circle at 38% 32%, #1e1260, #0a0720)",
+            boxShadow:"0 0 0 1px rgba(255,255,255,0.07), 0 24px 60px rgba(0,0,0,0.5)",
+            display:"flex", alignItems:"center", justifyContent:"center",
+          }}>
+            <motion.svg
+              viewBox="0 0 100 100"
+              xmlns="http://www.w3.org/2000/svg"
+              style={{ width:68, height:68, filter:"drop-shadow(0 6px 18px rgba(255,204,0,0.25))" }}
+              animate={{ y: [0, -7, -3, -9, 0], rotate: [-4, 3, -2, 4, -4] }}
+              transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
+            >
+              <defs>
+                <radialGradient id="bg2" cx="40%" cy="30%" r="65%">
+                  <stop offset="0%" stopColor="#3d2508"/>
+                  <stop offset="100%" stopColor="#1a0e03"/>
+                </radialGradient>
+                <radialGradient id="hg2" cx="38%" cy="32%" r="60%">
+                  <stop offset="0%" stopColor="#4a2e0a"/>
+                  <stop offset="100%" stopColor="#1f1005"/>
+                </radialGradient>
+                <radialGradient id="wg2" cx="50%" cy="30%" r="70%">
+                  <stop offset="0%" stopColor="rgba(220,235,255,0.92)"/>
+                  <stop offset="100%" stopColor="rgba(180,210,255,0.45)"/>
+                </radialGradient>
+                <radialGradient id="sg2" cx="50%" cy="20%" r="70%">
+                  <stop offset="0%" stopColor="#FFE066"/>
+                  <stop offset="100%" stopColor="#E6A800"/>
+                </radialGradient>
+              </defs>
+              {/* Alas */}
+              <motion.ellipse cx="30" cy="36" rx="20" ry="11" fill="url(#wg2)" stroke="rgba(255,255,255,0.35)" strokeWidth="0.6" transform="rotate(-15 30 36)"
+                animate={{ scaleY: [1, 0.5, 1] }} transition={{ duration: 0.12, repeat: Infinity, ease: "easeInOut" }} style={{ transformOrigin: "52% 60%" }} />
+              <motion.ellipse cx="24" cy="44" rx="13" ry="7" fill="rgba(200,225,255,0.5)" stroke="rgba(255,255,255,0.2)" strokeWidth="0.4" transform="rotate(-10 24 44)"
+                animate={{ scaleY: [1, 0.5, 1] }} transition={{ duration: 0.12, repeat: Infinity, ease: "easeInOut" }} style={{ transformOrigin: "52% 60%" }} />
+              <motion.ellipse cx="70" cy="36" rx="20" ry="11" fill="url(#wg2)" stroke="rgba(255,255,255,0.35)" strokeWidth="0.6" transform="rotate(15 70 36)"
+                animate={{ scaleY: [0.5, 1, 0.5] }} transition={{ duration: 0.12, repeat: Infinity, ease: "easeInOut" }} style={{ transformOrigin: "48% 60%" }} />
+              <motion.ellipse cx="76" cy="44" rx="13" ry="7" fill="rgba(200,225,255,0.5)" stroke="rgba(255,255,255,0.2)" strokeWidth="0.4" transform="rotate(10 76 44)"
+                animate={{ scaleY: [0.5, 1, 0.5] }} transition={{ duration: 0.12, repeat: Infinity, ease: "easeInOut" }} style={{ transformOrigin: "48% 60%" }} />
+              {/* Cuerpo */}
+              <ellipse cx="50" cy="66" rx="15" ry="21" fill="url(#bg2)"/>
+              <ellipse cx="45" cy="54" rx="5" ry="3" fill="rgba(255,255,255,0.08)" transform="rotate(-15 45 54)"/>
+              {/* Rayas */}
+              <path d="M36,57 Q50,54 64,57 Q64,63 50,64 Q36,63 36,57Z" fill="url(#sg2)"/>
+              <path d="M36,68 Q50,65 64,68 Q64,74 50,75 Q36,74 36,68Z" fill="url(#sg2)"/>
+              <path d="M36,57 Q50,54 64,57 L64,59 Q50,56 36,59Z" fill="rgba(0,0,0,0.15)"/>
+              <path d="M36,68 Q50,65 64,68 L64,70 Q50,67 36,70Z" fill="rgba(0,0,0,0.15)"/>
+              {/* Cabeza */}
+              <circle cx="50" cy="41" r="13" fill="url(#hg2)"/>
+              {/* Ojos */}
+              <circle cx="44" cy="40" r="5" fill="rgba(255,255,255,0.95)"/>
+              <circle cx="56" cy="40" r="5" fill="rgba(255,255,255,0.95)"/>
+              <circle cx="44.5" cy="40.5" r="3" fill="#0E0A35"/>
+              <circle cx="56.5" cy="40.5" r="3" fill="#0E0A35"/>
+              <circle cx="43" cy="39" r="1.2" fill="rgba(255,255,255,0.9)"/>
+              <circle cx="55" cy="39" r="1.2" fill="rgba(255,255,255,0.9)"/>
+              {/* Antenas */}
+              <path d="M45,29 Q42,22 38,17" stroke="#3d2508" strokeWidth="2" strokeLinecap="round" fill="none"/>
+              <path d="M55,29 Q58,22 62,17" stroke="#3d2508" strokeWidth="2" strokeLinecap="round" fill="none"/>
+              <circle cx="38" cy="16" r="3.5" fill="#FFCC00"/>
+              <circle cx="62" cy="16" r="3.5" fill="#FFCC00"/>
+              <circle cx="37.5" cy="15.5" r="1.2" fill="rgba(255,255,255,0.6)"/>
+              <circle cx="61.5" cy="15.5" r="1.2" fill="rgba(255,255,255,0.6)"/>
+              {/* Patas */}
+              <path d="M38,68 Q30,72 26,78" stroke="#2a1a06" strokeWidth="1.8" strokeLinecap="round" fill="none"/>
+              <path d="M38,73 Q30,78 27,84" stroke="#2a1a06" strokeWidth="1.5" strokeLinecap="round" fill="none"/>
+              <path d="M62,68 Q70,72 74,78" stroke="#2a1a06" strokeWidth="1.8" strokeLinecap="round" fill="none"/>
+              <path d="M62,73 Q70,78 73,84" stroke="#2a1a06" strokeWidth="1.5" strokeLinecap="round" fill="none"/>
+              {/* Aguijón */}
+              <path d="M50,86 Q49,90 50,94 Q51,90 50,86Z" fill="#2a1a06"/>
+            </motion.svg>
+          </div>
+        </div>
+
+        {/* Título */}
+        <h2 style={{
+          fontFamily:"'Montserrat', sans-serif", fontWeight:900,
+          fontSize:"1.75rem", color:"#fff", lineHeight:1.12,
+          letterSpacing:"-0.025em", marginBottom:"0.5rem",
+        }}>
+          Guardando tu<br/><span style={{ color:"#FFCC00" }}>registro.</span>
+        </h2>
+
+        {/* Mensaje rotante */}
+        <AnimatePresence mode="wait">
+          <motion.p
+            key={msgIdx}
+            initial={{ opacity:0, y:6 }}
+            animate={{ opacity:1, y:0 }}
+            exit={{ opacity:0, y:-6 }}
+            transition={{ duration:0.4 }}
+            style={{
+              fontFamily:"'Poppins', sans-serif",
+              fontSize:"0.83rem", color:"rgba(255,255,255,0.5)",
+              fontWeight:300, lineHeight:1.7,
+              minHeight:"2.5rem", marginBottom:"2rem",
+            }}
+          >
+            {SENDING_MESSAGES[msgIdx]}
+          </motion.p>
+        </AnimatePresence>
+
+        {/* Barra */}
+        <div style={{ width:"100%", height:3, background:"rgba(255,255,255,0.07)", borderRadius:999, overflow:"hidden", marginBottom:"1.2rem" }}>
+          <motion.div
+            animate={{ width:["8%","45%","72%","88%","88%"] }}
+            transition={{ duration:3.5, repeat:Infinity, ease:"easeInOut" }}
+            style={{ height:"100%", background:"linear-gradient(90deg, #1A428A, #FFCC00)", borderRadius:999 }}
+          />
+        </div>
+
+        {/* Puntos */}
+        <div style={{ display:"flex", justifyContent:"center", gap:7, marginTop:"1rem" }}>
+          {[0,1,2].map(i => (
+            <motion.div
+              key={i}
+              animate={{ scale:[1,1.5,1], background:["rgba(255,255,255,0.15)","#FFCC00","rgba(255,255,255,0.15)"] }}
+              transition={{ duration:1.5, repeat:Infinity, delay:i*0.25, ease:"easeInOut" }}
+              style={{ width:5, height:5, borderRadius:"50%", background:"rgba(255,255,255,0.2)" }}
+            />
+          ))}
+        </div>
+
+        {/* Badge */}
+        <div style={{
+          marginTop:"2.5rem",
+          fontFamily:"'Montserrat', sans-serif",
+          fontSize:"0.52rem", fontWeight:700,
+          letterSpacing:"0.22em", textTransform:"uppercase",
+          color:"rgba(255,255,255,0.2)",
+          display:"flex", alignItems:"center", justifyContent:"center", gap:10,
+        }}>
+          <div style={{ width:24, height:1, background:"rgba(255,255,255,0.12)" }} />
+          La Presentación · Admisiones 2027
+          <div style={{ width:24, height:1, background:"rgba(255,255,255,0.12)" }} />
+        </div>
+
+      </div>
+    </motion.div>
+  );
+}
 // ─── STEP TITLE ───────────────────────────────────────────────────────────────
 function StepTitle({ badge, title, sub }) {
   return (
