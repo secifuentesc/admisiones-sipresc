@@ -58,12 +58,18 @@ export async function guardarRegistro(datos) {
   };
 
   // ✅ text/plain evita el preflight CORS y Apps Script lo recibe bien
+  const controller = new AbortController();
+  const timeout = setTimeout(() => controller.abort(), 25000);
+  
   const response = await fetch(APPS_SCRIPT_URL, {
     method: "POST",
     headers: { "Content-Type": "text/plain" },
     body: JSON.stringify(payload),
-    redirect: "follow", // sigue el redirect 302 de Apps Script
+    redirect: "follow",
+    signal: controller.signal,
   });
+  
+  clearTimeout(timeout);
 
   const text = await response.text();
   console.log("📨 Respuesta raw:", text);
