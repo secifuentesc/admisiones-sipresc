@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef, useCallback } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 
-import { guardarRegistro } from "./api";
+import { guardarRegistro, subirArchivoADrive } from "./api";
 
 // ─── FONTS ────────────────────────────────────────────────────────────────────
 const FONTS = `
@@ -1070,7 +1070,7 @@ function StepOpenHouse({ data, setData }) {
 }
 
 // 11 — PAGO (solo admisión)
-function StepPago({ files, setFiles }) {
+function StepPago({ files, setFiles, data }) {
   return (
     <>
       <StepTitle badge="Pago" title="Comprobante de pago" sub="Sube el comprobante de la consignación de $40.000 a Bancolombia." />
@@ -1082,13 +1082,13 @@ function StepPago({ files, setFiles }) {
           <strong style={{ color:C.white }}>Instituto Parroquial Nuestra Señora de la Presentación</strong>
         </p>
       </div>
-      <FFile label="Comprobante de pago" fieldKey="comprobantePago" files={files} setFiles={setFiles} required />
+      <FFile label="Comprobante de pago" fieldKey="comprobantePago" files={files} setFiles={setFiles} required datosAspirante={data} />
     </>
   );
 }
 
 // 12 — DOCUMENTOS (solo admisión)
-function StepDocumentos({ files, setFiles }) {
+function StepDocumentos({ files, setFiles, data }) {
   const docs = [
     { key:"registroCivil", label:"Registro civil del aspirante", required:true },
     { key:"informeAcademico", label:"Último informe académico", required:true },
@@ -1099,7 +1099,7 @@ function StepDocumentos({ files, setFiles }) {
     <>
       <StepTitle badge="Documentos" title="Documentos requeridos" sub="Sube los documentos del aspirante. Puedes subir PDF, JPG o PNG." />
       {docs.map(d => (
-        <FFile key={d.key} label={d.label} fieldKey={d.key} files={files} setFiles={setFiles} required={d.required} />
+        <FFile key={d.key} label={d.label} fieldKey={d.key} files={files} setFiles={setFiles} required={d.required} datosAspirante={data} />
       ))}
     </>
   );
@@ -1578,8 +1578,13 @@ export default function Registro() {
     if (id === "openhouse") return data.numeroAsistentes && data.nombresAsistentes.trim();
     if (id === "continuarAdmision") return data.continuarAdmision !== null;
     if (id === "openHouseAdmision") return data.asistirOpenHouse !== null;
-    if (id === "pago") return !!files.comprobantePago;
-    if (id === "documentos") return true;
+    if (id === "pago") return !!files.comprobantePago_link;
+    if (id === "documentos") return (
+      !!files.registroCivil_link &&
+      !!files.informeAcademico_link &&
+      !!files.fichaSeguimiento_link &&
+      !!files.pazYSalvo_link
+    );
     if (id === "resumen") return true;
     return true;
   }, [currentStep, data, files]);
