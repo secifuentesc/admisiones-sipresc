@@ -18,59 +18,117 @@ const fileToBase64 = (file) => {
 export async function guardarRegistro(datos) {
   console.log("📝 Guardando registro...");
 
-  const comprobantePago   = datos.comprobantePago   ? await fileToBase64(datos.comprobantePago)   : null;
-  const registroCivil     = datos.registroCivil     ? await fileToBase64(datos.registroCivil)     : null;
-  const informeAcademico  = datos.informeAcademico  ? await fileToBase64(datos.informeAcademico)  : null;
-  const fichaSeguimiento  = datos.fichaSeguimiento  ? await fileToBase64(datos.fichaSeguimiento)  : null;
-  const pazYSalvo         = datos.pazYSalvo         ? await fileToBase64(datos.pazYSalvo)         : null;
+  const comprobantePago  = datos.comprobantePago  ? await fileToBase64(datos.comprobantePago)  : null;
+  const registroCivil    = datos.registroCivil    ? await fileToBase64(datos.registroCivil)    : null;
+  const informeAcademico = datos.informeAcademico ? await fileToBase64(datos.informeAcademico) : null;
+  const fichaSeguimiento = datos.fichaSeguimiento ? await fileToBase64(datos.fichaSeguimiento) : null;
+  const pazYSalvo        = datos.pazYSalvo        ? await fileToBase64(datos.pazYSalvo)        : null;
 
   const payload = {
     accion: "guardar",
-    tipoRegistro:       datos.tipoRegistro,
-    correo:             datos.correo,
-    correoOwner:        datos.correoOwner,
-    nombreAspirante:    datos.nombreAspirante,
-    apellidosAspirante: datos.apellidosAspirante,
-    fechaNacimiento:    datos.fechaNacimiento,
-    edad:               datos.edad,
-    grado:              datos.grado,
-    estudiaActual:      datos.estudiaActual,
-    colegioProcedencia: datos.colegioProcedencia,
-    nombrePadre:        datos.nombrePadre,
-    apellidosPadre:     datos.apellidosPadre,
-    correoPadre:        datos.correoPadre,
-    celularPadre:       datos.celularPadre,
-    nombreMadre:        datos.nombreMadre,
-    apellidosMadre:     datos.apellidosMadre,
-    correoMadre:        datos.correoMadre,
-    celularMadre:       datos.celularMadre,
-    nombreOtro:         datos.nombreOtro,
-    apellidosOtro:      datos.apellidosOtro,
-    correoOtro:         datos.correoOtro,
-    celularOtro:        datos.celularOtro,
-    motivacion:         datos.motivacion,
-    canalEnterado:      datos.canalEnterado,
-    asistirOpenHouse:   datos.asistirOpenHouse,
-    numeroAsistentes:   datos.numeroAsistentes,
-    nombresAsistentes:  datos.nombresAsistentes,
-    continuarAdmision:  datos.continuarAdmision,
-    comprobantePago:          comprobantePago?.base64 || null,
-    comprobantePago_tipo:     comprobantePago?.tipo   || null,
-    comprobantePago_nombre:   comprobantePago?.nombre || null,
-    registroCivil:            registroCivil?.base64   || null,
-    registroCivil_tipo:       registroCivil?.tipo     || null,
-    registroCivil_nombre:     registroCivil?.nombre   || null,
-    informeAcademico:         informeAcademico?.base64  || null,
-    informeAcademico_tipo:    informeAcademico?.tipo    || null,
-    informeAcademico_nombre:  informeAcademico?.nombre  || null,
-    fichaSeguimiento:         fichaSeguimiento?.base64  || null,
-    fichaSeguimiento_tipo:    fichaSeguimiento?.tipo    || null,
-    fichaSeguimiento_nombre:  fichaSeguimiento?.nombre  || null,
-    pazYSalvo:                pazYSalvo?.base64  || null,
-    pazYSalvo_tipo:           pazYSalvo?.tipo    || null,
-    pazYSalvo_nombre:         pazYSalvo?.nombre  || null,
+    tipoRegistro:            datos.tipoRegistro,
+    correo:                  datos.correo,
+    correoOwner:             datos.correoOwner,
+    nombreAspirante:         datos.nombreAspirante,
+    apellidosAspirante:      datos.apellidosAspirante,
+    fechaNacimiento:         datos.fechaNacimiento,
+    edad:                    datos.edad,
+    grado:                   datos.grado,
+    estudiaActual:           datos.estudiaActual,
+    colegioProcedencia:      datos.colegioProcedencia,
+    nombrePadre:             datos.nombrePadre,
+    apellidosPadre:          datos.apellidosPadre,
+    correoPadre:             datos.correoPadre,
+    celularPadre:            datos.celularPadre,
+    nombreMadre:             datos.nombreMadre,
+    apellidosMadre:          datos.apellidosMadre,
+    correoMadre:             datos.correoMadre,
+    celularMadre:            datos.celularMadre,
+    nombreOtro:              datos.nombreOtro,
+    apellidosOtro:           datos.apellidosOtro,
+    correoOtro:              datos.correoOtro,
+    celularOtro:             datos.celularOtro,
+    motivacion:              datos.motivacion,
+    canalEnterado:           datos.canalEnterado,
+    asistirOpenHouse:        datos.asistirOpenHouse,
+    numeroAsistentes:        datos.numeroAsistentes,
+    nombresAsistentes:       datos.nombresAsistentes,
+    continuarAdmision:       datos.continuarAdmision,
+    comprobantePago:         comprobantePago?.base64       || null,
+    comprobantePago_tipo:    comprobantePago?.tipo         || null,
+    comprobantePago_nombre:  comprobantePago?.nombre       || null,
+    registroCivil:           registroCivil?.base64         || null,
+    registroCivil_tipo:      registroCivil?.tipo           || null,
+    registroCivil_nombre:    registroCivil?.nombre         || null,
+    informeAcademico:        informeAcademico?.base64      || null,
+    informeAcademico_tipo:   informeAcademico?.tipo        || null,
+    informeAcademico_nombre: informeAcademico?.nombre      || null,
+    fichaSeguimiento:        fichaSeguimiento?.base64      || null,
+    fichaSeguimiento_tipo:   fichaSeguimiento?.tipo        || null,
+    fichaSeguimiento_nombre: fichaSeguimiento?.nombre      || null,
+    pazYSalvo:               pazYSalvo?.base64             || null,
+    pazYSalvo_tipo:          pazYSalvo?.tipo               || null,
+    pazYSalvo_nombre:        pazYSalvo?.nombre             || null,
   };
 
+  // Copia de seguridad local ANTES de enviar
+  try {
+    localStorage.setItem("ultimo_registro_pendiente", JSON.stringify({
+      payload,
+      timestamp: new Date().toISOString(),
+    }));
+  } catch(e) {}
+
+  // Intenta hasta 3 veces
+  const MAX_INTENTOS = 3;
+  let ultimoError = null;
+
+  for (let intento = 1; intento <= MAX_INTENTOS; intento++) {
+    try {
+      console.log(`🔄 Intento ${intento} de ${MAX_INTENTOS}...`);
+
+      const controller = new AbortController();
+      const timeout = setTimeout(() => controller.abort(), 25000);
+
+      const response = await fetch(APPS_SCRIPT_URL, {
+        method: "POST",
+        headers: { "Content-Type": "text/plain" },
+        body: JSON.stringify(payload),
+        redirect: "follow",
+        signal: controller.signal,
+      });
+
+      clearTimeout(timeout);
+
+      const text = await response.text();
+      console.log("📨 Respuesta raw:", text);
+
+      const resultado = JSON.parse(text);
+
+      if (resultado.success) {
+        try { localStorage.removeItem("ultimo_registro_pendiente"); } catch(e) {}
+        console.log("✅ Registro guardado en intento", intento);
+        return resultado;
+      }
+
+      ultimoError = resultado.error || "Error desconocido";
+      console.warn(`⚠️ Intento ${intento} fallido:`, ultimoError);
+
+      // Si es correo duplicado no reintentar
+      if (ultimoError.includes("Ya existe")) return resultado;
+
+    } catch(err) {
+      ultimoError = err.message;
+      console.warn(`⚠️ Intento ${intento} con excepción:`, err.message);
+      if (intento < MAX_INTENTOS) {
+        await new Promise(r => setTimeout(r, intento * 1000));
+      }
+    }
+  }
+
+  console.error("❌ Todos los intentos fallaron:", ultimoError);
+  return { success: false, error: ultimoError };
+}
   // ✅ text/plain evita el preflight CORS y Apps Script lo recibe bien
   const controller = new AbortController();
   const timeout = setTimeout(() => controller.abort(), 25000);
