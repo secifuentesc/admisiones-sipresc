@@ -155,6 +155,7 @@ export async function subirArchivoADrive(file, fieldKey, datosAspirante) {
     nombreAspirante: datosAspirante.nombreAspirante,
     apellidosAspirante: datosAspirante.apellidosAspirante,
     correo: datosAspirante.correo,
+    grado: datosAspirante.grado,
   };
 
   for (let intento = 1; intento <= MAX_INTENTOS; intento++) {
