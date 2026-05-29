@@ -18,11 +18,6 @@ const fileToBase64 = (file) => {
 export async function guardarRegistro(datos) {
   console.log("📝 Guardando registro...");
 
-  const comprobantePago  = datos.comprobantePago  ? await fileToBase64(datos.comprobantePago)  : null;
-  const registroCivil    = datos.registroCivil    ? await fileToBase64(datos.registroCivil)    : null;
-  const informeAcademico = datos.informeAcademico ? await fileToBase64(datos.informeAcademico) : null;
-  const fichaSeguimiento = datos.fichaSeguimiento ? await fileToBase64(datos.fichaSeguimiento) : null;
-  const pazYSalvo        = datos.pazYSalvo        ? await fileToBase64(datos.pazYSalvo)        : null;
 
   const payload = {
     accion: "guardar",
@@ -54,21 +49,11 @@ export async function guardarRegistro(datos) {
     numeroAsistentes:        datos.numeroAsistentes,
     nombresAsistentes:       datos.nombresAsistentes,
     continuarAdmision:       datos.continuarAdmision,
-    comprobantePago:         comprobantePago?.base64       || null,
-    comprobantePago_tipo:    comprobantePago?.tipo         || null,
-    comprobantePago_nombre:  comprobantePago?.nombre       || null,
-    registroCivil:           registroCivil?.base64         || null,
-    registroCivil_tipo:      registroCivil?.tipo           || null,
-    registroCivil_nombre:    registroCivil?.nombre         || null,
-    informeAcademico:        informeAcademico?.base64      || null,
-    informeAcademico_tipo:   informeAcademico?.tipo        || null,
-    informeAcademico_nombre: informeAcademico?.nombre      || null,
-    fichaSeguimiento:        fichaSeguimiento?.base64      || null,
-    fichaSeguimiento_tipo:   fichaSeguimiento?.tipo        || null,
-    fichaSeguimiento_nombre: fichaSeguimiento?.nombre      || null,
-    pazYSalvo:               pazYSalvo?.base64             || null,
-    pazYSalvo_tipo:          pazYSalvo?.tipo               || null,
-    pazYSalvo_nombre:        pazYSalvo?.nombre             || null,
+    comprobantePago:     datos.comprobantePago_link     || null,
+    registroCivil:       datos.registroCivil_link       || null,
+    informeAcademico:    datos.informeAcademico_link    || null,
+    fichaSeguimiento:    datos.fichaSeguimiento_link    || null,
+    pazYSalvo:           datos.pazYSalvo_link           || null,
   };
 
   // Copia de seguridad local ANTES de enviar
