@@ -1645,11 +1645,11 @@ const handleSubmit = async () => {
       numeroAsistentes: data.numeroAsistentes,
       nombresAsistentes: data.nombresAsistentes,
       continuarAdmision: data.continuarAdmision,
-      comprobantePago: files.comprobantePago,
-      registroCivil: files.registroCivil,
-      informeAcademico: files.informeAcademico,
-      fichaSeguimiento: files.fichaSeguimiento,
-      pazYSalvo: files.pazYSalvo,
+      comprobantePago_link: files.comprobantePago_link || null,
+      registroCivil_link: files.registroCivil_link || null,
+      informeAcademico_link: files.informeAcademico_link || null,
+      fichaSeguimiento_link: files.fichaSeguimiento_link || null,
+      pazYSalvo_link: files.pazYSalvo_link || null,
     };
 
     const resultado = await guardarRegistro(datosAEnviar);
