@@ -1,4 +1,4 @@
-// src/api.js - Sin proxy, Content-Type correcto
+// src/api.js
 const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbybF614uTYGOX3lU4FeNnBhqTbUmAcpiXGVCYNizBk7XPlcKsvUljU3RBMH-ANf9hOV/exec";
 
 const fileToBase64 = (file) => {
@@ -18,45 +18,43 @@ const fileToBase64 = (file) => {
 export async function guardarRegistro(datos) {
   console.log("📝 Guardando registro...");
 
-
   const payload = {
-    accion: "guardar",
-    tipoRegistro:            datos.tipoRegistro,
-    correo:                  datos.correo,
-    correoOwner:             datos.correoOwner,
-    nombreAspirante:         datos.nombreAspirante,
-    apellidosAspirante:      datos.apellidosAspirante,
-    fechaNacimiento:         datos.fechaNacimiento,
-    edad:                    datos.edad,
-    grado:                   datos.grado,
-    estudiaActual:           datos.estudiaActual,
-    colegioProcedencia:      datos.colegioProcedencia,
-    nombrePadre:             datos.nombrePadre,
-    apellidosPadre:          datos.apellidosPadre,
-    correoPadre:             datos.correoPadre,
-    celularPadre:            datos.celularPadre,
-    nombreMadre:             datos.nombreMadre,
-    apellidosMadre:          datos.apellidosMadre,
-    correoMadre:             datos.correoMadre,
-    celularMadre:            datos.celularMadre,
-    nombreOtro:              datos.nombreOtro,
-    apellidosOtro:           datos.apellidosOtro,
-    correoOtro:              datos.correoOtro,
-    celularOtro:             datos.celularOtro,
-    motivacion:              datos.motivacion,
-    canalEnterado:           datos.canalEnterado,
-    asistirOpenHouse:        datos.asistirOpenHouse,
-    numeroAsistentes:        datos.numeroAsistentes,
-    nombresAsistentes:       datos.nombresAsistentes,
-    continuarAdmision:       datos.continuarAdmision,
-    comprobantePago:     datos.comprobantePago_link     || null,
-    registroCivil:       datos.registroCivil_link       || null,
-    informeAcademico:    datos.informeAcademico_link    || null,
-    fichaSeguimiento:    datos.fichaSeguimiento_link    || null,
-    pazYSalvo:           datos.pazYSalvo_link           || null,
+    accion:              "guardar",
+    tipoRegistro:        datos.tipoRegistro,
+    correo:              datos.correo,
+    correoOwner:         datos.correoOwner,
+    nombreAspirante:     datos.nombreAspirante,
+    apellidosAspirante:  datos.apellidosAspirante,
+    fechaNacimiento:     datos.fechaNacimiento,
+    edad:                datos.edad,
+    grado:               datos.grado,
+    estudiaActual:       datos.estudiaActual,
+    colegioProcedencia:  datos.colegioProcedencia,
+    nombrePadre:         datos.nombrePadre,
+    apellidosPadre:      datos.apellidosPadre,
+    correoPadre:         datos.correoPadre,
+    celularPadre:        datos.celularPadre,
+    nombreMadre:         datos.nombreMadre,
+    apellidosMadre:      datos.apellidosMadre,
+    correoMadre:         datos.correoMadre,
+    celularMadre:        datos.celularMadre,
+    nombreOtro:          datos.nombreOtro,
+    apellidosOtro:       datos.apellidosOtro,
+    correoOtro:          datos.correoOtro,
+    celularOtro:         datos.celularOtro,
+    motivacion:          datos.motivacion,
+    canalEnterado:       datos.canalEnterado,
+    asistirOpenHouse:    datos.asistirOpenHouse,
+    numeroAsistentes:    datos.numeroAsistentes,
+    nombresAsistentes:   datos.nombresAsistentes,
+    continuarAdmision:   datos.continuarAdmision,
+    comprobantePago:     datos.comprobantePago_link  || null,
+    registroCivil:       datos.registroCivil_link    || null,
+    informeAcademico:    datos.informeAcademico_link || null,
+    fichaSeguimiento:    datos.fichaSeguimiento_link || null,
+    pazYSalvo:           datos.pazYSalvo_link        || null,
   };
 
-  // Copia de seguridad local ANTES de enviar
   try {
     localStorage.setItem("ultimo_registro_pendiente", JSON.stringify({
       payload,
@@ -64,7 +62,6 @@ export async function guardarRegistro(datos) {
     }));
   } catch(e) {}
 
-  // Intenta hasta 3 veces
   const MAX_INTENTOS = 3;
   let ultimoError = null;
 
@@ -99,7 +96,6 @@ export async function guardarRegistro(datos) {
       ultimoError = resultado.error || "Error desconocido";
       console.warn(`⚠️ Intento ${intento} fallido:`, ultimoError);
 
-      // Si es correo duplicado no reintentar
       if (ultimoError.includes("Ya existe")) return resultado;
 
     } catch(err) {
@@ -114,32 +110,6 @@ export async function guardarRegistro(datos) {
   console.error("❌ Todos los intentos fallaron:", ultimoError);
   return { success: false, error: ultimoError };
 }
-  // ✅ text/plain evita el preflight CORS y Apps Script lo recibe bien
-  const controller = new AbortController();
-  const timeout = setTimeout(() => controller.abort(), 25000);
-  
-  const response = await fetch(APPS_SCRIPT_URL, {
-    method: "POST",
-    headers: { "Content-Type": "text/plain" },
-    body: JSON.stringify(payload),
-    redirect: "follow",
-    signal: controller.signal,
-  });
-  
-  clearTimeout(timeout);
-
-  const text = await response.text();
-  console.log("📨 Respuesta raw:", text);
-
-  try {
-    const resultado = JSON.parse(text);
-    console.log("✅ Resultado:", resultado);
-    return resultado;
-  } catch {
-    console.error("❌ No se pudo parsear respuesta:", text);
-    return { success: false, error: "Respuesta inesperada del servidor" };
-  }
-}
 
 export async function subirArchivoADrive(file, fieldKey, datosAspirante) {
   const MAX_INTENTOS = 3;
@@ -148,14 +118,14 @@ export async function subirArchivoADrive(file, fieldKey, datosAspirante) {
   const fileData = await fileToBase64(file);
 
   const payload = {
-    accion: "subirArchivo",
-    base64: fileData.base64,
-    tipo: fileData.tipo,
-    nombre: `${fieldKey}_${datosAspirante.apellidosAspirante}_${datosAspirante.nombreAspirante}.${fileData.tipo.includes('pdf') ? 'pdf' : fileData.tipo.includes('png') ? 'png' : 'jpg'}`,
-    nombreAspirante: datosAspirante.nombreAspirante,
+    accion:             "subirArchivo",
+    base64:             fileData.base64,
+    tipo:               fileData.tipo,
+    nombre:             `${fieldKey}_${datosAspirante.apellidosAspirante}_${datosAspirante.nombreAspirante}.${fileData.tipo.includes('pdf') ? 'pdf' : fileData.tipo.includes('png') ? 'png' : 'jpg'}`,
+    nombreAspirante:    datosAspirante.nombreAspirante,
     apellidosAspirante: datosAspirante.apellidosAspirante,
-    correo: datosAspirante.correo,
-    grado: datosAspirante.grado,
+    correo:             datosAspirante.correo,
+    grado:              datosAspirante.grado,
   };
 
   for (let intento = 1; intento <= MAX_INTENTOS; intento++) {
