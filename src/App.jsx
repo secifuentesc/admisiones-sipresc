@@ -1238,6 +1238,14 @@ function RegistroSection() {
 function AdmissionStatusSection() {
   const [open, setOpen] = useState(false);
 
+useEffect(() => {
+  const params = new URLSearchParams(window.location.search);
+  if (params.get("consultar") === "1") {
+    setOpen(true);
+    window.history.replaceState({}, "", window.location.pathname);
+  }
+}, []);
+
   return (
     <>
       <Section
