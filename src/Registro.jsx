@@ -877,27 +877,38 @@ function StepCorreo({ data, setData, onProgressRestore, stepIdx, setStepIdx }) {
   const showOwner = data.correo.includes("@");
 
   const handleBlur = async () => {
-    if (!data.correo) return;
-    setChecking(true);
-    
-    try {
-      const saved = localStorage.getItem(`registro_${data.correo}`);
-      if (saved) {
-        const parsed = JSON.parse(saved);
-        if (parsed && parsed.stepIdx > 0) onProgressRestore(parsed);
-      }
-      
-      const resultado = await verificarCorreoExistente(data.correo);
-      if (resultado.existe && resultado.registros.length > 0) {
-  setHijosRegistrados(resultado.registros);
-  setShowHijosModal(true);
-}
-    } catch(e) {
-      console.error("Error verificando correo:", e);
-    } finally {
-      setChecking(false);
+  console.log("🔵 handleBlur ejecutado");
+  if (!data.correo) {
+    console.log("⚠️ No hay correo");
+    return;
+  }
+  console.log("🔵 Correo:", data.correo);
+  setChecking(true);
+  
+  try {
+    const saved = localStorage.getItem(`registro_${data.correo}`);
+    if (saved) {
+      const parsed = JSON.parse(saved);
+      if (parsed && parsed.stepIdx > 0) onProgressRestore(parsed);
     }
-  };
+    
+    console.log("🔍 Llamando a verificarCorreoExistente...");
+    const resultado = await verificarCorreoExistente(data.correo);
+    console.log("🔍 RESULTADO:", resultado);
+    
+    if (resultado.existe && resultado.registros.length > 0) {
+      console.log("✅ Registros encontrados:", resultado.registros);
+      setHijosRegistrados(resultado.registros);
+      setShowHijosModal(true);
+    } else {
+      console.log("❌ No se encontraron registros");
+    }
+  } catch(e) {
+    console.error("❌ Error verificando correo:", e);
+  } finally {
+    setChecking(false);
+  }
+};
 
   return (
     <>
