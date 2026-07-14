@@ -883,38 +883,49 @@ function StepCorreo({ data, setData, onProgressRestore, stepIdx, setStepIdx, set
   const showOwner = data.correo.includes("@");
 
   const handleBlur = async () => {
-    console.log("🔵 handleBlur ejecutado");
-    if (!data.correo) {
-      console.log("⚠️ No hay correo");
-      return;
+  console.log("🔵 handleBlur ejecutado");
+  if (!data.correo) {
+    console.log("⚠️ No hay correo");
+    return;
+  }
+  console.log("🔵 Correo:", data.correo);
+  setChecking(true);
+  
+  try {
+    const saved = localStorage.getItem(`registro_${data.correo}`);
+    if (saved) {
+      const parsed = JSON.parse(saved);
+      if (parsed && parsed.stepIdx > 0) onProgressRestore(parsed);
     }
-    console.log("🔵 Correo:", data.correo);
-    setChecking(true);
     
-    try {
-      const saved = localStorage.getItem(`registro_${data.correo}`);
-      if (saved) {
-        const parsed = JSON.parse(saved);
-        if (parsed && parsed.stepIdx > 0) onProgressRestore(parsed);
-      }
+    console.log("🔍 Llamando a verificarCorreoExistente...");
+    const resultado = await verificarCorreoExistente(data.correo);
+    console.log("🔍 RESULTADO:", resultado);
+    
+    if (resultado.existe && resultado.registros.length > 0) {
+      // ✅ FILTRAR: Solo registrar los que tienen tipo "openhouse"
+      const registrosOpenHouse = resultado.registros.filter(
+        r => r["Tipo de registro"] === "openhouse"
+      );
       
-      console.log("🔍 Llamando a verificarCorreoExistente...");
-      const resultado = await verificarCorreoExistente(data.correo);
-      console.log("🔍 RESULTADO:", resultado);
+      console.log("✅ Registros Open House encontrados:", registrosOpenHouse);
       
-      if (resultado.existe && resultado.registros.length > 0) {
-        console.log("✅ Registros encontrados:", resultado.registros);
-        setHijosRegistrados(resultado.registros);
+      if (registrosOpenHouse.length > 0) {
+        setHijosRegistrados(registrosOpenHouse);
         setShowHijosModal(true);
       } else {
-        console.log("❌ No se encontraron registros");
+        console.log("ℹ️ No hay registros de Open House pendientes. El usuario ya completó el proceso.");
+        // Opcional: mostrar mensaje al usuario
       }
-    } catch(e) {
-      console.error("❌ Error verificando correo:", e);
-    } finally {
-      setChecking(false);
+    } else {
+      console.log("❌ No se encontraron registros");
     }
-  };
+  } catch(e) {
+    console.error("❌ Error verificando correo:", e);
+  } finally {
+    setChecking(false);
+  }
+};
 
   return (
     <>
