@@ -1989,31 +1989,47 @@ export default function Registro() {
                   <button
                     key={index}
                     onClick={() => {
-                      setData(p => ({
-                        ...p,
-                        nombreAspirante: hijo["Nombres aspirante"] || "",
-                        apellidosAspirante: hijo["Apellidos aspirante"] || "",
-                        fechaNacimiento: hijo["Fecha nacimiento"] || "",
-                        edad: hijo["Edad"] || "",
-                        grado: hijo["Grado"] || "",
-                        colegioProcedencia: hijo["Colegio procedencia"] || "",
-                        nombrePadre: hijo["Nombres papá"] || "",
-                        apellidosPadre: hijo["Apellidos papá"] || "",
-                        correoPadre: hijo["Correo papá"] || "",
-                        celularPadre: hijo["Celular papá"] || "",
-                        nombreMadre: hijo["Nombres mamá"] || "",
-                        apellidosMadre: hijo["Apellidos mamá"] || "",
-                        correoMadre: hijo["Correo mamá"] || "",
-                        celularMadre: hijo["Celular mamá"] || "",
-                        nombreOtro: hijo["Nombres otro acudiente"] || "",
-                        apellidosOtro: hijo["Apellidos otro acudiente"] || "",
-                        correoOtro: hijo["Correo otro acudiente"] || "",
-                        celularOtro: hijo["Celular otro acudiente"] || "",
-                        motivacion: hijo["Motivación"] || "",
-                        canalEnterado: hijo["Canal de llegada"] || "",
-                      }));
-                      setShowHijosModal(false);
-                    }}
+  // 1. Precargar TODOS los datos del hijo
+  setData(p => ({
+    ...p,
+    nombreAspirante: hijo["Nombres aspirante"] || "",
+    apellidosAspirante: hijo["Apellidos aspirante"] || "",
+    fechaNacimiento: hijo["Fecha nacimiento"] || "",
+    edad: hijo["Edad"] || "",
+    grado: hijo["Grado"] || "",
+    colegioProcedencia: hijo["Colegio procedencia"] || "",
+    nombrePadre: hijo["Nombres papá"] || "",
+    apellidosPadre: hijo["Apellidos papá"] || "",
+    correoPadre: hijo["Correo papá"] || "",
+    celularPadre: hijo["Celular papá"] || "",
+    nombreMadre: hijo["Nombres mamá"] || "",
+    apellidosMadre: hijo["Apellidos mamá"] || "",
+    correoMadre: hijo["Correo mamá"] || "",
+    celularMadre: hijo["Celular mamá"] || "",
+    nombreOtro: hijo["Nombres otro acudiente"] || "",
+    apellidosOtro: hijo["Apellidos otro acudiente"] || "",
+    correoOtro: hijo["Correo otro acudiente"] || "",
+    celularOtro: hijo["Celular otro acudiente"] || "",
+    motivacion: hijo["Motivación"] || "",
+    canalEnterado: hijo["Canal de llegada"] || "",
+    numeroAsistentes: hijo["Número asistentes"] || "",
+    nombresAsistentes: hijo["Nombres asistentes"] || "",
+    asistirOpenHouse: hijo["¿Asiste a Open House?"] === "Sí" ? true : (hijo["¿Asiste a Open House?"] === "No" ? false : null),
+    continuarAdmision: hijo["¿Continúa a admisión?"] === "Sí" ? true : (hijo["¿Continúa a admisión?"] === "No" ? false : null),
+    estudiaActual: hijo["¿Estudia actualmente?"] === "Sí" ? true : (hijo["¿Estudia actualmente?"] === "No" ? false : null),
+    // ⚠️ IMPORTANTE: NO precargar tipoRegistro para que el usuario pueda elegir
+  }));
+  
+  // 2. Cerrar el modal
+  setShowHijosModal(false);
+  
+  // 3. ✅ AVANZAR AL SIGUIENTE PASO (para ver los datos cargados)
+  // Si el usuario está en el paso de correo (stepIdx = 2), avanzar al siguiente
+  if (stepIdx === 2) {
+    setDir(1);
+    setStepIdx(3); // Ir a "Aspirante" donde se verán los datos precargados
+  }
+}}
                     style={{
                       all: "unset", cursor: "pointer",
                       width: "100%", textAlign: "left",
