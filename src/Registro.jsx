@@ -872,7 +872,7 @@ function StepPolitica({ data, setData }) {
   );
 }
 
-function StepCorreo({ data, setData, onProgressRestore }) {
+function StepCorreo({ data, setData, onProgressRestore, stepIdx, setStepIdx }) {
   const [checking, setChecking] = useState(false);
   const showOwner = data.correo.includes("@");
 
@@ -889,9 +889,9 @@ function StepCorreo({ data, setData, onProgressRestore }) {
       
       const resultado = await verificarCorreoExistente(data.correo);
       if (resultado.existe && resultado.registros.length > 0) {
-        setHijosRegistrados(resultado.registros);
-        setShowHijosModal(true);
-      }
+  setHijosRegistrados(resultado.registros);
+  setShowHijosModal(true);
+}
     } catch(e) {
       console.error("Error verificando correo:", e);
     } finally {
@@ -1850,7 +1850,7 @@ export default function Registro() {
     const props = { data, setData, files, setFiles };
     if (id === "tipo") return <StepTipo {...props} />;
     if (id === "politica") return <StepPolitica {...props} />;
-    if (id === "correo") return <StepCorreo {...props} onProgressRestore={handleProgressRestore} />;
+    if (id === "correo") return <StepCorreo {...props} onProgressRestore={handleProgressRestore} stepIdx={stepIdx} setStepIdx={setStepIdx} />;
     if (id === "aspirante") return <StepAspirante {...props} />;
     if (id === "grado") return <StepGrado {...props} />;
     if (id === "estudia") return <StepEstudiaActual {...props} />;
