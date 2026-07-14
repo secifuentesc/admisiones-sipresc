@@ -280,7 +280,7 @@ function Topbar({ stepIdx, totalSteps, tipoRegistro }) {
 }
 
 // ─── UI COMPONENTS ────────────────────────────────────────────────────────────
-function FInput({ label, type="text", value, onChange, placeholder, required, hint, maxLength }) {
+function FInput({ label, type="text", value, onChange, placeholder, required, hint, maxLength, onBlur }) {
   const [foc, setFoc] = useState(false);
   return (
     <div style={{ marginBottom:"1rem", width:"100%" }}>
@@ -296,9 +296,16 @@ function FInput({ label, type="text", value, onChange, placeholder, required, hi
         </p>
       )}
       <input
-        type={type} value={value} onChange={onChange}
-        placeholder={placeholder} maxLength={maxLength}
-        onFocus={()=>setFoc(true)} onBlur={()=>setFoc(false)}
+        type={type} 
+        value={value} 
+        onChange={onChange}
+        placeholder={placeholder} 
+        maxLength={maxLength}
+        onFocus={()=>setFoc(true)} 
+        onBlur={(e) => {
+          setFoc(false);
+          if (onBlur) onBlur(e);
+        }}
         style={{
           width:"100%", background: C.white,
           border:`2px solid ${foc ? C.accent : C.line}`,
@@ -313,7 +320,6 @@ function FInput({ label, type="text", value, onChange, placeholder, required, hi
     </div>
   );
 }
-
 function FTextarea({ label, value, onChange, placeholder, rows=4, required }) {
   const [foc, setFoc] = useState(false);
   return (
