@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef, useCallback } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 
-import { guardarRegistro, subirArchivoADrive } from "./api";
+import { guardarRegistro, subirArchivoADrive, verificarCorreoExistente } from "./api";
 
 // ─── FONTS ────────────────────────────────────────────────────────────────────
 const FONTS = `
@@ -210,7 +210,6 @@ function Topbar({ stepIdx, totalSteps, tipoRegistro }) {
         padding:"0 1.5rem", height:"64px",
         display:"flex", alignItems:"center", justifyContent:"space-between",
       }}>
-        {/* Logo */}
         <a href="https://admisiones.sipresc.co" style={{ display:"flex", alignItems:"center", gap:"12px", textDecoration:"none" }}>
           <div style={{
             fontFamily:"'CollegiateBlackFLF', serif",
@@ -233,7 +232,6 @@ function Topbar({ stepIdx, totalSteps, tipoRegistro }) {
           </div>
         </a>
 
-        {/* Paso + tipo */}
         <div style={{ display:"flex", alignItems:"center", gap:"16px" }}>
           {tipoRegistro && (
             <span style={{
@@ -267,7 +265,6 @@ function Topbar({ stepIdx, totalSteps, tipoRegistro }) {
         </div>
       </div>
 
-      {/* Barra progreso */}
       <div style={{ height:"3px", background: C.line }}>
         <motion.div
           animate={{ width:`${pct}%` }}
@@ -358,18 +355,13 @@ function FChoice({ title, sub, note, selected, onClick, disabled }) {
       whileTap={!disabled ? { scale:0.997 } : {}}
       onClick={!disabled ? onClick : undefined}
       style={{
-        // Elimina todos los estilos por defecto del botón
         all:"unset",
-        // Convierte en un flex container que respeta ancho
         display:"flex",
         alignItems:"center",
         gap:"1rem",
         width:"100%",
-        // Fuerza a no crecer más allá del contenedor
         maxWidth:"100%",
-        // El texto se alinea a la izquierda
         textAlign:"left",
-        // Estilos visuales
         cursor: disabled ? "default" : "pointer",
         background: selected ? C.panel : C.white,
         border:`2px solid ${selected ? C.accent : C.line}`,
@@ -379,13 +371,10 @@ function FChoice({ title, sub, note, selected, onClick, disabled }) {
         transition:"all 0.18s",
         boxShadow: selected ? `0 0 0 4px rgba(26,66,138,0.08)` : "0 1px 6px rgba(33,20,95,0.04)",
         opacity: disabled ? 0.5 : 1,
-        // Asegura que el botón no se estire más allá del contenedor padre
         boxSizing:"border-box",
-        // Importante: fuerza al botón a no superar el ancho del padre
         overflow:"hidden",
       }}
     >
-      {/* Círculo de radio */}
       <div style={{
         width:"22px", height:"22px", borderRadius:"50%", flexShrink:0,
         border:`2px solid ${selected ? C.accent : C.lineHov}`,
@@ -397,11 +386,9 @@ function FChoice({ title, sub, note, selected, onClick, disabled }) {
           <div style={{ width:"8px", height:"8px", borderRadius:"50%", background:C.white }} />
         )}
       </div>
-      {/* Contenedor del texto con flex:1 y minWidth:0 */}
       <div style={{
         flex:1,
         minWidth:0,
-        // Permite que el texto se ajuste al ancho disponible
         wordWrap:"break-word",
         overflowWrap:"break-word",
         wordBreak:"break-word",
@@ -412,7 +399,6 @@ function FChoice({ title, sub, note, selected, onClick, disabled }) {
           fontSize:"0.95rem",
           fontWeight:700,
           color: selected ? C.dark : C.body,
-          // Evita que el texto fuerce un ancho mayor
           maxWidth:"100%",
         }}>{title}</p>
         {sub && <p style={{ fontFamily:"'Poppins', sans-serif", fontSize:"0.8rem", color:C.muted, marginTop:"0.2rem", lineHeight:1.5 }}>{sub}</p>}
@@ -454,7 +440,6 @@ function FFile({ label, fieldKey, files, setFiles, required, maxMB = 30, datosAs
   const [uploading, setUploading] = useState(false);
   const [uploaded, setUploaded] = useState(false);
 
-  // Si ya tiene link guardado, marcarlo como subido
   useEffect(() => {
     if (files[`${fieldKey}_link`]) setUploaded(true);
   }, []);
@@ -463,13 +448,11 @@ function FFile({ label, fieldKey, files, setFiles, required, maxMB = 30, datosAs
     const f = e.target.files[0];
     if (!f) return;
 
-    // Validar tamaño
     if (f.size > maxMB * 1024 * 1024) {
       setError(`El archivo supera el límite de ${maxMB}MB. Por favor comprime el documento e intenta de nuevo.`);
       return;
     }
 
-    // Validar tipo
     const tiposValidos = ['application/pdf', 'image/jpeg', 'image/jpg', 'image/png'];
     if (!tiposValidos.includes(f.type) && !f.name.match(/\.(pdf|jpg|jpeg|png)$/i)) {
       setError("Solo se permiten archivos PDF, JPG o PNG.");
@@ -523,7 +506,6 @@ function FFile({ label, fieldKey, files, setFiles, required, maxMB = 30, datosAs
             <span style={{ fontFamily: "'Montserrat', sans-serif", fontSize: "0.55rem", fontWeight: 700, letterSpacing: "0.14em", textTransform: "uppercase", color: required ? C.accent : C.muted, background: required ? C.panel : "#F3F4F6", padding: "0.18rem 0.55rem", borderRadius: "999px", border: required ? `1px solid rgba(26,66,138,0.2)` : "1px solid #E5E7EB" }}>{required ? "Requerido" : "Opcional"}</span>
           </div>
 
-          {/* Estado: sin archivo */}
           {!file && !uploading && (
             <label htmlFor={id} style={{ display: "flex", alignItems: "center", gap: "10px", cursor: "pointer", background: C.bg, border: `2px dashed ${error ? "#EF4444" : C.line}`, borderRadius: "12px", padding: "0.8rem 1rem", transition: "border-color 0.15s" }}>
               <svg width="16" height="16" viewBox="0 0 20 20" fill="none" stroke={C.muted} strokeWidth="1.8" strokeLinecap="round"><path d="M10 13V3m-4 4l4-4 4 4" /><path d="M3 17h14" /></svg>
@@ -533,7 +515,6 @@ function FFile({ label, fieldKey, files, setFiles, required, maxMB = 30, datosAs
             </label>
           )}
 
-          {/* Estado: subiendo */}
           {uploading && (
             <div style={{ display: "flex", alignItems: "center", gap: "10px", background: C.panel, border: `1.5px solid ${C.lineHov}`, borderRadius: "12px", padding: "0.75rem 1rem" }}>
               <svg width="16" height="16" viewBox="0 0 20 20" fill="none" stroke={C.accent} strokeWidth="1.8" strokeLinecap="round"><path d="M10 13V3m-4 4l4-4 4 4" /><path d="M3 17h14" /></svg>
@@ -541,7 +522,6 @@ function FFile({ label, fieldKey, files, setFiles, required, maxMB = 30, datosAs
             </div>
           )}
 
-          {/* Estado: subido exitosamente */}
           {uploaded && file && !uploading && (
             <div style={{ display: "flex", alignItems: "center", gap: "10px", background: "#F0FDF4", border: "1.5px solid #86EFAC", borderRadius: "12px", padding: "0.75rem 1rem" }}>
               <svg width="16" height="16" viewBox="0 0 20 20" fill="none" stroke="#16A34A" strokeWidth="1.8" strokeLinecap="round"><path d="M14 2H6a2 2 0 00-2 2v12a2 2 0 002 2h8a2 2 0 002-2V4a2 2 0 00-2-2z" /><path d="M8 10h4M8 13h2" /></svg>
@@ -591,13 +571,10 @@ function SendingScreen() {
         overflow: "hidden",
       }}
     >
-      {/* Glows */}
       <div style={{ position:"absolute", width:500, height:500, borderRadius:"50%", background:"rgba(26,66,138,0.18)", top:-150, left:-150, filter:"blur(60px)" }} />
       <div style={{ position:"absolute", width:400, height:400, borderRadius:"50%", background:"rgba(255,204,0,0.07)", bottom:-100, right:-100, filter:"blur(60px)" }} />
 
       <div style={{ position:"relative", zIndex:10, textAlign:"center", padding:"2rem", maxWidth:400, width:"100%" }}>
-
-        {/* Bee */}
         <div style={{ position:"relative", width:140, height:140, margin:"0 auto 2.5rem" }}>
           <motion.div
             animate={{ rotate: 360 }}
@@ -659,7 +636,6 @@ function SendingScreen() {
                   <stop offset="100%" stopColor="#E6A800"/>
                 </radialGradient>
               </defs>
-              {/* Alas */}
               <motion.ellipse cx="30" cy="36" rx="20" ry="11" fill="url(#wg2)" stroke="rgba(255,255,255,0.35)" strokeWidth="0.6" transform="rotate(-15 30 36)"
                 animate={{ scaleY: [1, 0.5, 1] }} transition={{ duration: 0.12, repeat: Infinity, ease: "easeInOut" }} style={{ transformOrigin: "52% 60%" }} />
               <motion.ellipse cx="24" cy="44" rx="13" ry="7" fill="rgba(200,225,255,0.5)" stroke="rgba(255,255,255,0.2)" strokeWidth="0.4" transform="rotate(-10 24 44)"
@@ -668,42 +644,34 @@ function SendingScreen() {
                 animate={{ scaleY: [0.5, 1, 0.5] }} transition={{ duration: 0.12, repeat: Infinity, ease: "easeInOut" }} style={{ transformOrigin: "48% 60%" }} />
               <motion.ellipse cx="76" cy="44" rx="13" ry="7" fill="rgba(200,225,255,0.5)" stroke="rgba(255,255,255,0.2)" strokeWidth="0.4" transform="rotate(10 76 44)"
                 animate={{ scaleY: [0.5, 1, 0.5] }} transition={{ duration: 0.12, repeat: Infinity, ease: "easeInOut" }} style={{ transformOrigin: "48% 60%" }} />
-              {/* Cuerpo */}
               <ellipse cx="50" cy="66" rx="15" ry="21" fill="url(#bg2)"/>
               <ellipse cx="45" cy="54" rx="5" ry="3" fill="rgba(255,255,255,0.08)" transform="rotate(-15 45 54)"/>
-              {/* Rayas */}
               <path d="M36,57 Q50,54 64,57 Q64,63 50,64 Q36,63 36,57Z" fill="url(#sg2)"/>
               <path d="M36,68 Q50,65 64,68 Q64,74 50,75 Q36,74 36,68Z" fill="url(#sg2)"/>
               <path d="M36,57 Q50,54 64,57 L64,59 Q50,56 36,59Z" fill="rgba(0,0,0,0.15)"/>
               <path d="M36,68 Q50,65 64,68 L64,70 Q50,67 36,70Z" fill="rgba(0,0,0,0.15)"/>
-              {/* Cabeza */}
               <circle cx="50" cy="41" r="13" fill="url(#hg2)"/>
-              {/* Ojos */}
               <circle cx="44" cy="40" r="5" fill="rgba(255,255,255,0.95)"/>
               <circle cx="56" cy="40" r="5" fill="rgba(255,255,255,0.95)"/>
               <circle cx="44.5" cy="40.5" r="3" fill="#0E0A35"/>
               <circle cx="56.5" cy="40.5" r="3" fill="#0E0A35"/>
               <circle cx="43" cy="39" r="1.2" fill="rgba(255,255,255,0.9)"/>
               <circle cx="55" cy="39" r="1.2" fill="rgba(255,255,255,0.9)"/>
-              {/* Antenas */}
               <path d="M45,29 Q42,22 38,17" stroke="#3d2508" strokeWidth="2" strokeLinecap="round" fill="none"/>
               <path d="M55,29 Q58,22 62,17" stroke="#3d2508" strokeWidth="2" strokeLinecap="round" fill="none"/>
               <circle cx="38" cy="16" r="3.5" fill="#FFCC00"/>
               <circle cx="62" cy="16" r="3.5" fill="#FFCC00"/>
               <circle cx="37.5" cy="15.5" r="1.2" fill="rgba(255,255,255,0.6)"/>
               <circle cx="61.5" cy="15.5" r="1.2" fill="rgba(255,255,255,0.6)"/>
-              {/* Patas */}
               <path d="M38,68 Q30,72 26,78" stroke="#2a1a06" strokeWidth="1.8" strokeLinecap="round" fill="none"/>
               <path d="M38,73 Q30,78 27,84" stroke="#2a1a06" strokeWidth="1.5" strokeLinecap="round" fill="none"/>
               <path d="M62,68 Q70,72 74,78" stroke="#2a1a06" strokeWidth="1.8" strokeLinecap="round" fill="none"/>
               <path d="M62,73 Q70,78 73,84" stroke="#2a1a06" strokeWidth="1.5" strokeLinecap="round" fill="none"/>
-              {/* Aguijón */}
               <path d="M50,86 Q49,90 50,94 Q51,90 50,86Z" fill="#2a1a06"/>
             </motion.svg>
           </div>
         </div>
 
-        {/* Título */}
         <h2 style={{
           fontFamily:"'Montserrat', sans-serif", fontWeight:900,
           fontSize:"1.75rem", color:"#fff", lineHeight:1.12,
@@ -712,7 +680,6 @@ function SendingScreen() {
           Guardando tu<br/><span style={{ color:"#FFCC00" }}>registro.</span>
         </h2>
 
-        {/* Mensaje rotante */}
         <AnimatePresence mode="wait">
           <motion.p
             key={msgIdx}
@@ -731,7 +698,6 @@ function SendingScreen() {
           </motion.p>
         </AnimatePresence>
 
-        {/* Barra */}
         <div style={{ width:"100%", height:3, background:"rgba(255,255,255,0.07)", borderRadius:999, overflow:"hidden", marginBottom:"1.2rem" }}>
           <motion.div
             animate={{ width:["8%","45%","72%","88%","88%"] }}
@@ -740,7 +706,6 @@ function SendingScreen() {
           />
         </div>
 
-        {/* Puntos */}
         <div style={{ display:"flex", justifyContent:"center", gap:7, marginTop:"1rem" }}>
           {[0,1,2].map(i => (
             <motion.div
@@ -752,7 +717,6 @@ function SendingScreen() {
           ))}
         </div>
 
-        {/* Badge */}
         <div style={{
           marginTop:"2.5rem",
           fontFamily:"'Montserrat', sans-serif",
@@ -765,11 +729,11 @@ function SendingScreen() {
           La Presentación · Admisiones 2027
           <div style={{ width:24, height:1, background:"rgba(255,255,255,0.12)" }} />
         </div>
-
       </div>
     </motion.div>
   );
 }
+
 // ─── STEP TITLE ───────────────────────────────────────────────────────────────
 function StepTitle({ badge, title, sub }) {
   return (
@@ -802,7 +766,6 @@ function StepTitle({ badge, title, sub }) {
 
 // ─── STEPS ───────────────────────────────────────────────────────────────────
 
-// 0 — TIPO
 function StepTipo({ data, setData }) {
   return (
     <>
@@ -811,7 +774,6 @@ function StepTipo({ data, setData }) {
         title="¿Cómo quieres comenzar?"
         sub="Elige el camino que mejor se adapta a tu familia."
       />
-
       <FChoice
         title="Asistir al Open House"
         sub="Visita el colegio el 11 de julio, conoce los espacios y el equipo. Sin costo, sin documentos."
@@ -826,8 +788,6 @@ function StepTipo({ data, setData }) {
         selected={data.tipoRegistro === "admision"}
         onClick={() => setData(p => ({ ...p, tipoRegistro:"admision" }))}
       />
-
-      {/* Info pago si elige admisión */}
       <AnimatePresence>
         {data.tipoRegistro === "admision" && (
           <motion.div
@@ -876,7 +836,6 @@ function StepTipo({ data, setData }) {
   );
 }
 
-// 1 — POLÍTICA
 function StepPolitica({ data, setData }) {
   return (
     <>
@@ -913,24 +872,31 @@ function StepPolitica({ data, setData }) {
   );
 }
 
-// 2 — CORREO
 function StepCorreo({ data, setData, onProgressRestore }) {
   const [checking, setChecking] = useState(false);
   const showOwner = data.correo.includes("@");
 
-  const handleBlur = () => {
+  const handleBlur = async () => {
     if (!data.correo) return;
     setChecking(true);
-    setTimeout(() => {
-      try {
-        const saved = localStorage.getItem(`registro_${data.correo}`);
-        if (saved) {
-          const parsed = JSON.parse(saved);
-          if (parsed && parsed.stepIdx > 0) onProgressRestore(parsed);
-        }
-      } catch(e) {}
+    
+    try {
+      const saved = localStorage.getItem(`registro_${data.correo}`);
+      if (saved) {
+        const parsed = JSON.parse(saved);
+        if (parsed && parsed.stepIdx > 0) onProgressRestore(parsed);
+      }
+      
+      const resultado = await verificarCorreoExistente(data.correo);
+      if (resultado.existe && resultado.registros.length > 0) {
+        setHijosRegistrados(resultado.registros);
+        setShowHijosModal(true);
+      }
+    } catch(e) {
+      console.error("Error verificando correo:", e);
+    } finally {
       setChecking(false);
-    }, 400);
+    }
   };
 
   return (
@@ -960,7 +926,6 @@ function StepCorreo({ data, setData, onProgressRestore }) {
                   <div style={{ width: "20px", height: "20px", borderRadius: "50%", flexShrink: 0, border: `2px solid ${active ? C.accent : C.lineHov}`, background: active ? C.accent : "transparent", display: "flex", alignItems: "center", justifyContent: "center" }}>
                     {active && <div style={{ width: "7px", height: "7px", borderRadius: "50%", background: C.white }} />}
                   </div>
-                  
                   <span style={{ fontFamily: "'Montserrat', sans-serif", fontSize: "0.88rem", fontWeight: 700, color: active ? C.dark : C.body }}>{op.label}</span>
                 </motion.button>
               );
@@ -1687,25 +1652,25 @@ export default function Registro() {
   const [files, setFiles] = useState(EMPTY_FILES);
   const [restoreCandidate, setRestoreCandidate] = useState(null);
   const [sending, setSending] = useState(false);
+  const [showHijosModal, setShowHijosModal] = useState(false);
+  const [hijosRegistrados, setHijosRegistrados] = useState([]);
 
   const modo = data.tipoRegistro;
   const isAdmision = modo === "admision";
   const isOH = modo === "openhouse";
 
-  // Guardado local
   useEffect(() => {
     if (data.correo && stepIdx > 0) {
       try { localStorage.setItem(`registro_${data.correo}`, JSON.stringify({ data, stepIdx })); } catch(e) {}
     }
   }, [data, stepIdx]);
 
-    // Leer tipo desde URL (viene desde la landing)
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
     const tipo = params.get("tipo");
     if (tipo && ["openhouse", "admision", "ambos"].includes(tipo)) {
       setData(prev => ({ ...prev, tipoRegistro: tipo }));
-      setStepIdx(1); // salta directamente a política
+      setStepIdx(1);
     }
   }, []);
 
@@ -1719,7 +1684,6 @@ export default function Registro() {
     setRestoreCandidate(null);
   };
 
-  // Construcción dinámica de steps
   const buildSteps = useCallback(() => {
     const steps = [];
     steps.push({ id:"tipo" });
@@ -1748,16 +1712,13 @@ export default function Registro() {
 
     if (isAdmision) {
       steps.push({ id:"openHouseAdmision" });
-      if (data.asistirOpenHouse === true) {
-        // ya se preguntó arriba en el mismo step
-      }
       steps.push({ id:"pago" });
       steps.push({ id:"documentos" });
     }
 
     steps.push({ id:"resumen" });
     return steps;
-  }, [data.nivelDetectado, data.grado, isOH, isAdmision, data.continuarAdmision, data.asistirOpenHouse]);
+  }, [data.nivelDetectado, data.grado, isOH, isAdmision, data.continuarAdmision]);
 
   const steps = buildSteps();
   const currentStep = steps[stepIdx];
@@ -1774,18 +1735,18 @@ export default function Registro() {
     if (id === "estudia") return data.estudiaActual !== null && (data.estudiaActual === false || data.colegioProcedencia.trim());
     if (id === "colegio") return data.colegioProcedencia.trim();
     if (id === "acudientes") {
-  const sel = data.acudientesSeleccionados || [];
-  if (!sel.length) return false;
-  return sel.every(tipo => {
-    const campos = {
-      papa: { ap: "apellidosPadre", nm: "nombrePadre", co: "correoPadre", ce: "celularPadre" },
-      mama: { ap: "apellidosMadre", nm: "nombreMadre", co: "correoMadre", ce: "celularMadre" },
-      otro: { ap: "apellidosOtro", nm: "nombreOtro", co: "correoOtro", ce: "celularOtro" },
-    }[tipo];
-    const correoVal = data.correoOwner === tipo ? data.correo : data[campos.co];
-    return data[campos.ap]?.trim() && data[campos.nm]?.trim() && correoVal?.includes("@") && data[campos.ce]?.trim();
-  });
-}
+      const sel = data.acudientesSeleccionados || [];
+      if (!sel.length) return false;
+      return sel.every(tipo => {
+        const campos = {
+          papa: { ap: "apellidosPadre", nm: "nombrePadre", co: "correoPadre", ce: "celularPadre" },
+          mama: { ap: "apellidosMadre", nm: "nombreMadre", co: "correoMadre", ce: "celularMadre" },
+          otro: { ap: "apellidosOtro", nm: "nombreOtro", co: "correoOtro", ce: "celularOtro" },
+        }[tipo];
+        const correoVal = data.correoOwner === tipo ? data.correo : data[campos.co];
+        return data[campos.ap]?.trim() && data[campos.nm]?.trim() && correoVal?.includes("@") && data[campos.ce]?.trim();
+      });
+    }
     if (id === "motivacion") return data.motivacion.trim() && data.canalEnterado;
     if (id === "openhouse") return data.numeroAsistentes && data.nombresAsistentes.trim();
     if (id === "continuarAdmision") return data.continuarAdmision !== null;
@@ -1818,72 +1779,70 @@ export default function Registro() {
     }
   };
 
+  const handleSubmit = async () => {
+    setSending(true);
 
-// Reemplaza la función handleSubmit existente
-const handleSubmit = async () => {
-  setSending(true);
+    try {
+      let tipoRegistroFinal = data.tipoRegistro;
+      if (data.tipoRegistro === "openhouse" && data.continuarAdmision === true) tipoRegistroFinal = "openhouse_admision";
+      if (data.tipoRegistro === "admision" && data.asistirOpenHouse === true) tipoRegistroFinal = "admision_openhouse";
 
-  try {
-    let tipoRegistroFinal = data.tipoRegistro;
-    if (data.tipoRegistro === "openhouse" && data.continuarAdmision === true) tipoRegistroFinal = "openhouse_admision";
-    if (data.tipoRegistro === "admision" && data.asistirOpenHouse === true) tipoRegistroFinal = "admision_openhouse";
+      const datosAEnviar = {
+        tipoRegistro: tipoRegistroFinal,
+        correo: data.correo,
+        correoOwner: data.correoOwner,
+        nombreAspirante: data.nombreAspirante,
+        apellidosAspirante: data.apellidosAspirante,
+        fechaNacimiento: data.fechaNacimiento,
+        edad: data.edad,
+        grado: data.grado,
+        estudiaActual: data.estudiaActual,
+        colegioProcedencia: data.colegioProcedencia,
+        nombrePadre: data.nombrePadre,
+        apellidosPadre: data.apellidosPadre,
+        correoPadre: data.correoPadre,
+        celularPadre: data.celularPadre,
+        nombreMadre: data.nombreMadre,
+        apellidosMadre: data.apellidosMadre,
+        correoMadre: data.correoMadre,
+        celularMadre: data.celularMadre,
+        nombreOtro: data.nombreOtro,
+        apellidosOtro: data.apellidosOtro,
+        correoOtro: data.correoOtro,
+        celularOtro: data.celularOtro,
+        motivacion: data.motivacion,
+        canalEnterado: data.canalEnterado,
+        asistirOpenHouse: data.asistirOpenHouse,
+        numeroAsistentes: data.numeroAsistentes,
+        nombresAsistentes: data.nombresAsistentes,
+        continuarAdmision: data.continuarAdmision,
+        comprobantePago_link: files.comprobantePago_link || null,
+        registroCivil_link: files.registroCivil_link || null,
+        informeAcademico_link: files.informeAcademico_link || null,
+        fichaSeguimiento_link: files.fichaSeguimiento_link || null,
+        pazYSalvo_link: files.pazYSalvo_link || null,
+      };
 
-    const datosAEnviar = {
-      tipoRegistro: tipoRegistroFinal,
-      correo: data.correo,
-      correoOwner: data.correoOwner,
-      nombreAspirante: data.nombreAspirante,
-      apellidosAspirante: data.apellidosAspirante,
-      fechaNacimiento: data.fechaNacimiento,
-      edad: data.edad,
-      grado: data.grado,
-      estudiaActual: data.estudiaActual,
-      colegioProcedencia: data.colegioProcedencia,
-      nombrePadre: data.nombrePadre,
-      apellidosPadre: data.apellidosPadre,
-      correoPadre: data.correoPadre,
-      celularPadre: data.celularPadre,
-      nombreMadre: data.nombreMadre,
-      apellidosMadre: data.apellidosMadre,
-      correoMadre: data.correoMadre,
-      celularMadre: data.celularMadre,
-      nombreOtro: data.nombreOtro,
-      apellidosOtro: data.apellidosOtro,
-      correoOtro: data.correoOtro,
-      celularOtro: data.celularOtro,
-      motivacion: data.motivacion,
-      canalEnterado: data.canalEnterado,
-      asistirOpenHouse: data.asistirOpenHouse,
-      numeroAsistentes: data.numeroAsistentes,
-      nombresAsistentes: data.nombresAsistentes,
-      continuarAdmision: data.continuarAdmision,
-      comprobantePago_link: files.comprobantePago_link || null,
-      registroCivil_link: files.registroCivil_link || null,
-      informeAcademico_link: files.informeAcademico_link || null,
-      fichaSeguimiento_link: files.fichaSeguimiento_link || null,
-      pazYSalvo_link: files.pazYSalvo_link || null,
-    };
+      const resultado = await guardarRegistro(datosAEnviar);
 
-    const resultado = await guardarRegistro(datosAEnviar);
-
-    if (resultado.success) {
-      try { localStorage.removeItem(`registro_${data.correo}`); } catch(e) {}
-      setPhase("done");
-    } else {
-      if (resultado.error?.includes("Ya existe")) {
-        setPhase("duplicado");
+      if (resultado.success) {
+        try { localStorage.removeItem(`registro_${data.correo}`); } catch(e) {}
+        setPhase("done");
       } else {
-        setPhase("error");
+        if (resultado.error?.includes("Ya existe")) {
+          setPhase("duplicado");
+        } else {
+          setPhase("error");
+        }
       }
-    }
 
-  } catch (error) {
-    console.error("Error al enviar:", error);
-    setPhase("error");
-  } finally {
-    setSending(false);
-  }
-};
+    } catch (error) {
+      console.error("Error al enviar:", error);
+      setPhase("error");
+    } finally {
+      setSending(false);
+    }
+  };
 
   const renderStep = () => {
     if (!currentStep) return null;
@@ -1908,63 +1867,63 @@ const handleSubmit = async () => {
   };
 
   if (sending) return (
-  <AnimatePresence>
-    <SendingScreen />
-  </AnimatePresence>
-);
+    <AnimatePresence>
+      <SendingScreen />
+    </AnimatePresence>
+  );
 
   if (phase === "duplicado") return (
-  <>
-    <style>{FONTS}</style>
-    <Topbar stepIdx={0} totalSteps={0} tipoRegistro={null} />
-    <div style={{ minHeight:"100vh", background:C.bg, display:"flex", alignItems:"center", justifyContent:"center", padding:"2rem" }}>
-      <div style={{ maxWidth:"480px", width:"100%", textAlign:"center" }}>
-        <div style={{ fontSize:"3rem", marginBottom:"1.5rem" }}>📋</div>
-        <h2 style={{ fontFamily:"'Montserrat', sans-serif", fontWeight:800, fontSize:"1.6rem", color:C.dark, marginBottom:"1rem" }}>
-          Ya tienes un registro
-        </h2>
-        <p style={{ fontFamily:"'Poppins', sans-serif", fontSize:"0.9rem", color:C.muted, lineHeight:1.7, marginBottom:"1.5rem" }}>
-          Ya existe un registro con el correo <strong style={{ color:C.dark }}>{data.correo}</strong>. Si crees que es un error, escríbenos.
-        </p>
-        <a href="https://admisiones.sipresc.co" style={{ all:"unset", cursor:"pointer", background:C.dark, color:C.white, fontFamily:"'Montserrat', sans-serif", fontWeight:700, fontSize:"0.82rem", padding:"0.9rem 2rem", borderRadius:"999px", display:"inline-block" }}>
-          Volver a admisiones
-        </a>
-      </div>
-    </div>
-  </>
-);
-
-if (phase === "error") return (
-  <>
-    <style>{FONTS}</style>
-    <Topbar stepIdx={0} totalSteps={0} tipoRegistro={null} />
-    <div style={{ minHeight:"100vh", background:C.bg, display:"flex", alignItems:"center", justifyContent:"center", padding:"2rem" }}>
-      <div style={{ maxWidth:"480px", width:"100%", textAlign:"center" }}>
-        <div style={{ fontSize:"3rem", marginBottom:"1.5rem" }}>⚠️</div>
-        <h2 style={{ fontFamily:"'Montserrat', sans-serif", fontWeight:800, fontSize:"1.6rem", color:C.dark, marginBottom:"1rem" }}>
-          Hubo un problema al enviar
-        </h2>
-        <p style={{ fontFamily:"'Poppins', sans-serif", fontSize:"0.9rem", color:C.muted, lineHeight:1.7, marginBottom:"0.5rem" }}>
-          Tu información está guardada en este dispositivo. Intenta de nuevo o escríbenos directamente:
-        </p>
-        <p style={{ fontFamily:"'Montserrat', sans-serif", fontWeight:700, fontSize:"0.9rem", color:C.accent, marginBottom:"1.5rem" }}>
-          admisiones@lapresentaciongirardota.edu.co
-        </p>
-        <div style={{ display:"flex", gap:"10px", justifyContent:"center", flexWrap:"wrap" }}>
-          <button
-            onClick={() => { setPhase("form"); setSending(false); }}
-            style={{ all:"unset", cursor:"pointer", background:C.dark, color:C.white, fontFamily:"'Montserrat', sans-serif", fontWeight:700, fontSize:"0.82rem", padding:"0.9rem 2rem", borderRadius:"999px" }}
-          >
-            Intentar de nuevo
-          </button>
-          <a href="https://admisiones.sipresc.co" style={{ all:"unset", cursor:"pointer", background:C.bg, color:C.body, fontFamily:"'Montserrat', sans-serif", fontWeight:600, fontSize:"0.82rem", padding:"0.9rem 2rem", borderRadius:"999px", border:`1px solid ${C.line}` }}>
-            Volver
+    <>
+      <style>{FONTS}</style>
+      <Topbar stepIdx={0} totalSteps={0} tipoRegistro={null} />
+      <div style={{ minHeight:"100vh", background:C.bg, display:"flex", alignItems:"center", justifyContent:"center", padding:"2rem" }}>
+        <div style={{ maxWidth:"480px", width:"100%", textAlign:"center" }}>
+          <div style={{ fontSize:"3rem", marginBottom:"1.5rem" }}>📋</div>
+          <h2 style={{ fontFamily:"'Montserrat', sans-serif", fontWeight:800, fontSize:"1.6rem", color:C.dark, marginBottom:"1rem" }}>
+            Ya tienes un registro
+          </h2>
+          <p style={{ fontFamily:"'Poppins', sans-serif", fontSize:"0.9rem", color:C.muted, lineHeight:1.7, marginBottom:"1.5rem" }}>
+            Ya existe un registro con el correo <strong style={{ color:C.dark }}>{data.correo}</strong>. Si crees que es un error, escríbenos.
+          </p>
+          <a href="https://admisiones.sipresc.co" style={{ all:"unset", cursor:"pointer", background:C.dark, color:C.white, fontFamily:"'Montserrat', sans-serif", fontWeight:700, fontSize:"0.82rem", padding:"0.9rem 2rem", borderRadius:"999px", display:"inline-block" }}>
+            Volver a admisiones
           </a>
         </div>
       </div>
-    </div>
-  </>
-);
+    </>
+  );
+
+  if (phase === "error") return (
+    <>
+      <style>{FONTS}</style>
+      <Topbar stepIdx={0} totalSteps={0} tipoRegistro={null} />
+      <div style={{ minHeight:"100vh", background:C.bg, display:"flex", alignItems:"center", justifyContent:"center", padding:"2rem" }}>
+        <div style={{ maxWidth:"480px", width:"100%", textAlign:"center" }}>
+          <div style={{ fontSize:"3rem", marginBottom:"1.5rem" }}>⚠️</div>
+          <h2 style={{ fontFamily:"'Montserrat', sans-serif", fontWeight:800, fontSize:"1.6rem", color:C.dark, marginBottom:"1rem" }}>
+            Hubo un problema al enviar
+          </h2>
+          <p style={{ fontFamily:"'Poppins', sans-serif", fontSize:"0.9rem", color:C.muted, lineHeight:1.7, marginBottom:"0.5rem" }}>
+            Tu información está guardada en este dispositivo. Intenta de nuevo o escríbenos directamente:
+          </p>
+          <p style={{ fontFamily:"'Montserrat', sans-serif", fontWeight:700, fontSize:"0.9rem", color:C.accent, marginBottom:"1.5rem" }}>
+            admisiones@lapresentaciongirardota.edu.co
+          </p>
+          <div style={{ display:"flex", gap:"10px", justifyContent:"center", flexWrap:"wrap" }}>
+            <button
+              onClick={() => { setPhase("form"); setSending(false); }}
+              style={{ all:"unset", cursor:"pointer", background:C.dark, color:C.white, fontFamily:"'Montserrat', sans-serif", fontWeight:700, fontSize:"0.82rem", padding:"0.9rem 2rem", borderRadius:"999px" }}
+            >
+              Intentar de nuevo
+            </button>
+            <a href="https://admisiones.sipresc.co" style={{ all:"unset", cursor:"pointer", background:C.bg, color:C.body, fontFamily:"'Montserrat', sans-serif", fontWeight:600, fontSize:"0.82rem", padding:"0.9rem 2rem", borderRadius:"999px", border:`1px solid ${C.line}` }}>
+              Volver
+            </a>
+          </div>
+        </div>
+      </div>
+    </>
+  );
 
   if (phase === "done") return (
     <>
@@ -1994,6 +1953,103 @@ if (phase === "error") return (
         )}
       </AnimatePresence>
 
+      {/* Modal de selección de hijos */}
+      <AnimatePresence>
+        {showHijosModal && hijosRegistrados.length > 0 && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            style={{
+              position: "fixed", inset: 0, zIndex: 200,
+              background: "rgba(14,10,53,0.6)", backdropFilter: "blur(12px)",
+              display: "flex", alignItems: "center", justifyContent: "center",
+              padding: "1.5rem",
+            }}
+          >
+            <motion.div
+              initial={{ opacity: 0, y: 24, scale: 0.97 }}
+              animate={{ opacity: 1, y: 0, scale: 1 }}
+              style={{
+                background: "#FFFFFF", borderRadius: "24px",
+                padding: "2rem", maxWidth: "480px", width: "100%",
+                boxShadow: "0 32px 80px rgba(14,10,53,0.22)",
+              }}
+            >
+              <h3 style={{ fontFamily: "'Montserrat', sans-serif", fontWeight: 800, fontSize: "1.3rem", color: "#21145F", marginBottom: "0.5rem" }}>
+                Ya tienes registros previos
+              </h3>
+              <p style={{ fontFamily: "'Poppins', sans-serif", fontSize: "0.85rem", color: "#9CA3AF", lineHeight: 1.65, marginBottom: "1.5rem" }}>
+                Encontramos {hijosRegistrados.length} aspirante(s) registrado(s) con este correo.
+                Selecciona para qué hijo quieres continuar el proceso.
+              </p>
+              
+              <div style={{ display: "flex", flexDirection: "column", gap: "8px", marginBottom: "1.5rem" }}>
+                {hijosRegistrados.map((hijo, index) => (
+                  <button
+                    key={index}
+                    onClick={() => {
+                      setData(p => ({
+                        ...p,
+                        nombreAspirante: hijo["Nombres aspirante"] || "",
+                        apellidosAspirante: hijo["Apellidos aspirante"] || "",
+                        fechaNacimiento: hijo["Fecha nacimiento"] || "",
+                        edad: hijo["Edad"] || "",
+                        grado: hijo["Grado"] || "",
+                        colegioProcedencia: hijo["Colegio procedencia"] || "",
+                        nombrePadre: hijo["Nombres papá"] || "",
+                        apellidosPadre: hijo["Apellidos papá"] || "",
+                        correoPadre: hijo["Correo papá"] || "",
+                        celularPadre: hijo["Celular papá"] || "",
+                        nombreMadre: hijo["Nombres mamá"] || "",
+                        apellidosMadre: hijo["Apellidos mamá"] || "",
+                        correoMadre: hijo["Correo mamá"] || "",
+                        celularMadre: hijo["Celular mamá"] || "",
+                        nombreOtro: hijo["Nombres otro acudiente"] || "",
+                        apellidosOtro: hijo["Apellidos otro acudiente"] || "",
+                        correoOtro: hijo["Correo otro acudiente"] || "",
+                        celularOtro: hijo["Celular otro acudiente"] || "",
+                        motivacion: hijo["Motivación"] || "",
+                        canalEnterado: hijo["Canal de llegada"] || "",
+                      }));
+                      setShowHijosModal(false);
+                    }}
+                    style={{
+                      all: "unset", cursor: "pointer",
+                      width: "100%", textAlign: "left",
+                      background: "#F7F8FC", border: "1px solid #E8EAF0",
+                      borderRadius: "12px", padding: "1rem",
+                      transition: "all 0.15s",
+                    }}
+                  >
+                    <p style={{ fontFamily: "'Montserrat', sans-serif", fontWeight: 700, color: "#21145F" }}>
+                      {hijo["Nombres aspirante"]} {hijo["Apellidos aspirante"]}
+                    </p>
+                    <p style={{ fontFamily: "'Poppins', sans-serif", fontSize: "0.8rem", color: "#9CA3AF" }}>
+                      Grado: {hijo["Grado"]} · Estado: {hijo["Estado actual"] || "Registro recibido"}
+                    </p>
+                  </button>
+                ))}
+              </div>
+              
+              <button
+                onClick={() => setShowHijosModal(false)}
+                style={{
+                  all: "unset", cursor: "pointer",
+                  width: "100%", textAlign: "center",
+                  fontFamily: "'Montserrat', sans-serif", fontWeight: 600,
+                  fontSize: "0.82rem", color: "#9CA3AF",
+                  padding: "0.8rem", borderRadius: "12px",
+                  border: "1px solid #E8EAF0",
+                }}
+              >
+                Registrar un nuevo aspirante
+              </button>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
       {/* Form content */}
       <div style={{
         paddingTop:"80px", paddingBottom:"100px",
@@ -2012,7 +2068,6 @@ if (phase === "error") return (
               exit="exit"
               transition={{ duration:0.38, ease:[0.22,1,0.36,1] }}
             >
-              {/* Card */}
               <div style={{
                 background:"rgba(255,255,255,0.88)",
                 backdropFilter:"blur(24px)",
