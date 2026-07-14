@@ -178,3 +178,50 @@ export async function consultarEstado(correo, celular) {
   const response = await fetch(`${APPS_SCRIPT_URL}?${params.toString()}`);
   return await response.json();
 }
+
+export async function obtenerDatosFamilia(correo) {
+  console.log("🔍 Obteniendo datos de familia para:", correo);
+  
+  const payload = {
+    accion: "obtenerFamilia",
+    correo: correo,
+  };
+
+  try {
+    const response = await fetch(APPS_SCRIPT_URL, {
+      method: "POST",
+      headers: { "Content-Type": "text/plain" },
+      body: JSON.stringify(payload),
+    });
+
+    const text = await response.text();
+    console.log("📨 Respuesta obtenerFamilia:", text);
+    
+    const resultado = JSON.parse(text);
+    return resultado;
+  } catch (error) {
+    console.error("❌ Error en obtenerDatosFamilia:", error);
+    return { success: false, error: error.message };
+  }
+}
+
+export async function verificarCorreoExistente(correo) {
+  console.log("🔍 Verificando si el correo existe:", correo);
+  
+  try {
+    const resultado = await obtenerDatosFamilia(correo);
+    
+    if (resultado.success && resultado.data && resultado.data.length > 0) {
+      return {
+        existe: true,
+        registros: resultado.data,
+        cantidad: resultado.data.length,
+      };
+    }
+    
+    return { existe: false, registros: [], cantidad: 0 };
+  } catch (error) {
+    console.error("❌ Error verificando correo:", error);
+    return { existe: false, registros: [], cantidad: 0, error: error.message };
+  }
+}
