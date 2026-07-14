@@ -1701,6 +1701,16 @@ export default function Registro() {
     }
   }, [data, stepIdx]);
 
+  // ✅ Avanzar automáticamente cuando se precargan datos
+useEffect(() => {
+  // Si hay datos precargados y estamos en el paso 2 (correo), avanzar al paso 3
+  if (data.nombreAspirante && stepIdx === 2) {
+    console.log("🔄 Avanzando automáticamente al paso 3");
+    setDir(1);
+    setStepIdx(3);
+  }
+}, [data.nombreAspirante, stepIdx]);
+
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
     const tipo = params.get("tipo");
@@ -2024,8 +2034,8 @@ export default function Registro() {
                 {hijosRegistrados.map((hijo, index) => (
                   <button
                     key={index}
-                    onClick={() => {
-  // 1. Precargar TODOS los datos del hijo
+                   onClick={() => {
+  // ✅ SOLO precargar datos (sin avanzar manualmente)
   setData(p => ({
     ...p,
     nombreAspirante: hijo["Nombres aspirante"] || "",
@@ -2053,18 +2063,10 @@ export default function Registro() {
     asistirOpenHouse: hijo["¿Asiste a Open House?"] === "Sí" ? true : (hijo["¿Asiste a Open House?"] === "No" ? false : null),
     continuarAdmision: hijo["¿Continúa a admisión?"] === "Sí" ? true : (hijo["¿Continúa a admisión?"] === "No" ? false : null),
     estudiaActual: hijo["¿Estudia actualmente?"] === "Sí" ? true : (hijo["¿Estudia actualmente?"] === "No" ? false : null),
-    // ⚠️ IMPORTANTE: NO precargar tipoRegistro para que el usuario pueda elegir
   }));
   
-  // 2. Cerrar el modal
+  // ✅ Cerrar el modal (el useEffect se encargará del avance)
   setShowHijosModal(false);
-  
-  // 3. ✅ AVANZAR AL SIGUIENTE PASO (para ver los datos cargados)
-  // Si el usuario está en el paso de correo (stepIdx = 2), avanzar al siguiente
-  if (stepIdx === 2) {
-    setDir(1);
-    setStepIdx(3); // Ir a "Aspirante" donde se verán los datos precargados
-  }
 }}
                     style={{
                       all: "unset", cursor: "pointer",
