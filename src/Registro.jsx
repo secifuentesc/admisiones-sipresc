@@ -878,57 +878,57 @@ function StepPolitica({ data, setData }) {
   );
 }
 
-function StepCorreo({ data, setData, onProgressRestore, stepIdx, setStepIdx }) {
+function StepCorreo({ data, setData, onProgressRestore, stepIdx, setStepIdx, setHijosRegistrados, setShowHijosModal }) {
   const [checking, setChecking] = useState(false);
   const showOwner = data.correo.includes("@");
 
   const handleBlur = async () => {
-  console.log("🔵 handleBlur ejecutado");
-  if (!data.correo) {
-    console.log("⚠️ No hay correo");
-    return;
-  }
-  console.log("🔵 Correo:", data.correo);
-  setChecking(true);
-  
-  try {
-    const saved = localStorage.getItem(`registro_${data.correo}`);
-    if (saved) {
-      const parsed = JSON.parse(saved);
-      if (parsed && parsed.stepIdx > 0) onProgressRestore(parsed);
+    console.log("🔵 handleBlur ejecutado");
+    if (!data.correo) {
+      console.log("⚠️ No hay correo");
+      return;
     }
+    console.log("🔵 Correo:", data.correo);
+    setChecking(true);
     
-    console.log("🔍 Llamando a verificarCorreoExistente...");
-    const resultado = await verificarCorreoExistente(data.correo);
-    console.log("🔍 RESULTADO:", resultado);
-    
-    if (resultado.existe && resultado.registros.length > 0) {
-      console.log("✅ Registros encontrados:", resultado.registros);
-      setHijosRegistrados(resultado.registros);
-      setShowHijosModal(true);
-    } else {
-      console.log("❌ No se encontraron registros");
+    try {
+      const saved = localStorage.getItem(`registro_${data.correo}`);
+      if (saved) {
+        const parsed = JSON.parse(saved);
+        if (parsed && parsed.stepIdx > 0) onProgressRestore(parsed);
+      }
+      
+      console.log("🔍 Llamando a verificarCorreoExistente...");
+      const resultado = await verificarCorreoExistente(data.correo);
+      console.log("🔍 RESULTADO:", resultado);
+      
+      if (resultado.existe && resultado.registros.length > 0) {
+        console.log("✅ Registros encontrados:", resultado.registros);
+        setHijosRegistrados(resultado.registros);
+        setShowHijosModal(true);
+      } else {
+        console.log("❌ No se encontraron registros");
+      }
+    } catch(e) {
+      console.error("❌ Error verificando correo:", e);
+    } finally {
+      setChecking(false);
     }
-  } catch(e) {
-    console.error("❌ Error verificando correo:", e);
-  } finally {
-    setChecking(false);
-  }
-};
+  };
 
   return (
     <>
       <StepTitle badge="Tu correo" title="¿Cuál es el correo de la familia?" sub="Con este correo podrás consultar el estado de tu proceso en cualquier momento." />
       <FInput 
-  label="Correo electrónico" 
-  type="email" 
-  value={data.correo} 
-  onChange={e => setData(p => ({ ...p, correo: e.target.value }))}
-  placeholder="familia@ejemplo.com" 
-  required 
-  hint="Asegúrate de que esté correcto — es el identificador principal del proceso." 
-  onBlur={handleBlur}
-/>
+        label="Correo electrónico" 
+        type="email" 
+        value={data.correo} 
+        onChange={e => setData(p => ({ ...p, correo: e.target.value }))}
+        placeholder="familia@ejemplo.com" 
+        required 
+        hint="Asegúrate de que esté correcto — es el identificador principal del proceso." 
+        onBlur={handleBlur}
+      />
       {checking && <p style={{ fontFamily: "'Poppins', sans-serif", fontSize: "0.78rem", color: C.muted }}>Verificando progreso guardado...</p>}
       {showOwner && (
         <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} style={{ paddingTop: "1.25rem", borderTop: `1px solid ${C.line}`, marginTop: "1rem" }}>
@@ -962,7 +962,6 @@ function StepCorreo({ data, setData, onProgressRestore, stepIdx, setStepIdx }) {
     </>
   );
 }
-
 // 3 — ASPIRANTE
 function StepAspirante({ data, setData }) {
   const [dia, setDia] = useState("");
@@ -1876,7 +1875,7 @@ export default function Registro() {
     const props = { data, setData, files, setFiles };
     if (id === "tipo") return <StepTipo {...props} />;
     if (id === "politica") return <StepPolitica {...props} />;
-    if (id === "correo") return <StepCorreo {...props} onProgressRestore={handleProgressRestore} stepIdx={stepIdx} setStepIdx={setStepIdx} />;
+    if (id === "correo") return <StepCorreo {...props} onProgressRestore={handleProgressRestore} stepIdx={stepIdx} setStepIdx={setStepIdx} setHijosRegistrados={setHijosRegistrados} setShowHijosModal={setShowHijosModal} />;
     if (id === "aspirante") return <StepAspirante {...props} />;
     if (id === "grado") return <StepGrado {...props} />;
     if (id === "estudia") return <StepEstudiaActual {...props} />;
