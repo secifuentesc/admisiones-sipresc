@@ -357,7 +357,7 @@ function Hero() {
             <span className="hidden sm:inline">Open House</span>
             <span className="sm:hidden">OH</span>
             <span className={scrolled ? "text-[#1A428A]/40" : "text-white/30"}>·</span>
-            <span style={{ color: scrolled ? "#10B981" : "#6EE7B7" }}>Realizado ✓</span>
+            <span style={{ color: scrolled ? "#FFCC00" : "#FFCC00" }}>Realizado</span>
           </div>
         </div>
       </motion.header>
@@ -549,9 +549,9 @@ function OpenHouseSection() {
               variants={fadeUp}
               className="inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-bold tracking-wider mb-6"
               style={{
-                background: "rgba(16,185,129,0.15)",
-                color: "#6EE7B7",
-                border: "1px solid rgba(16,185,129,0.3)",
+                background: "rgba(255,204,0,0.15)",
+                color: "#FFCC00",
+                border: "1px solid rgba(255,204,0,0.3)",
                 backdropFilter: "blur(16px)",
               }}
             >
@@ -625,8 +625,8 @@ function OpenHouseSection() {
                   <div
                     className="w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold flex-shrink-0"
                     style={{
-                      background: i === 0 ? "#10B981" : "rgba(255,255,255,0.12)",
-                      color: i === 0 ? "#FFFFFF" : "#FFFFFF",
+                      background: i === 0 ? "#FFCC00" : "rgba(255,255,255,0.12)",
+                      color: i === 0 ? "#21145F" : "#FFFFFF",
                     }}
                   >
                     {String(i + 1).padStart(2, "0")}
