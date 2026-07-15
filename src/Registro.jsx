@@ -878,7 +878,7 @@ function StepPolitica({ data, setData }) {
   );
 }
 
-function StepCorreo({ data, setData, onProgressRestore, stepIdx, setStepIdx, setHijosRegistrados, setShowHijosModal }) {
+function StepCorreo({ data, setData, onProgressRestore, stepIdx, setStepIdx, setHijosRegistrados, setShowHijosModal, setDatosEncontrados, setShowConfirmarModal }) {
   const [checking, setChecking] = useState(false);
   const showOwner = data.correo.includes("@");
 
@@ -1888,7 +1888,7 @@ export default function Registro() {
     const props = { data, setData, files, setFiles };
     if (id === "tipo") return <StepTipo {...props} />;
     if (id === "politica") return <StepPolitica {...props} />;
-    if (id === "correo") return <StepCorreo {...props} onProgressRestore={handleProgressRestore} stepIdx={stepIdx} setStepIdx={setStepIdx} setHijosRegistrados={setHijosRegistrados} setShowHijosModal={setShowHijosModal} />;
+    if (id === "correo") return <StepCorreo {...props} onProgressRestore={handleProgressRestore} stepIdx={stepIdx} setStepIdx={setStepIdx} setHijosRegistrados={setHijosRegistrados} setShowHijosModal={setShowHijosModal} setDatosEncontrados={setDatosEncontrados} setShowConfirmarModal={setShowConfirmarModal} />;
     if (id === "aspirante") return <StepAspirante {...props} />;
     if (id === "grado") return <StepGrado {...props} />;
     if (id === "estudia") return <StepEstudiaActual {...props} />;
