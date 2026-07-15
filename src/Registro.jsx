@@ -1733,16 +1733,16 @@ export default function Registro() {
       <AbstractBackground nivel={data.nivelDetectado} />
       <Topbar stepIdx={stepIdx} totalSteps={totalSteps} />
 
-      {/* Restore modal */}
-      <AnimatePresence>
-        {restoreCandidate && (
-          <RestoreModal
-            savedData={restoreCandidate}
-            onRestore={handleRestore}
-            onDismiss={() => setRestoreCandidate(null)}
-          />
-        )}
-      </AnimatePresence>
+    {/* Restore modal - DESACTIVADO TEMPORALMENTE */}
+{/* <AnimatePresence>
+  {restoreCandidate && (
+    <RestoreModal
+      savedData={restoreCandidate}
+      onRestore={handleRestore}
+      onDismiss={() => setRestoreCandidate(null)}
+    />
+  )}
+</AnimatePresence> */}
 
       {/* Form content */}
       <div style={{
