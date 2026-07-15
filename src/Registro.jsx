@@ -903,7 +903,6 @@ function StepCorreo({ data, setData, onProgressRestore, stepIdx, setStepIdx, set
     console.log("🔍 RESULTADO:", resultado);
     
     if (resultado.existe && resultado.registros.length > 0) {
-      // ✅ FILTRAR: Solo registrar los que tienen tipo "openhouse"
       const registrosOpenHouse = resultado.registros.filter(
         r => r["Tipo de registro"] === "openhouse"
       );
@@ -911,11 +910,11 @@ function StepCorreo({ data, setData, onProgressRestore, stepIdx, setStepIdx, set
       console.log("✅ Registros Open House encontrados:", registrosOpenHouse);
       
       if (registrosOpenHouse.length > 0) {
-        setHijosRegistrados(registrosOpenHouse);
-        setShowHijosModal(true);
+        // ✅ GUARDAR datos y mostrar MODAL 1 (confirmar)
+        setDatosEncontrados(registrosOpenHouse);
+        setShowConfirmarModal(true);
       } else {
-        console.log("ℹ️ No hay registros de Open House pendientes. El usuario ya completó el proceso.");
-        // Opcional: mostrar mensaje al usuario
+        console.log("ℹ️ No hay registros de Open House pendientes.");
       }
     } else {
       console.log("❌ No se encontraron registros");
@@ -1688,6 +1687,8 @@ export default function Registro() {
   const [files, setFiles] = useState(EMPTY_FILES);
   const [restoreCandidate, setRestoreCandidate] = useState(null);
   const [sending, setSending] = useState(false);
+  const [showConfirmarModal, setShowConfirmarModal] = useState(false);
+  const [datosEncontrados, setDatosEncontrados] = useState([]);
   const [showHijosModal, setShowHijosModal] = useState(false);
   const [hijosRegistrados, setHijosRegistrados] = useState([]);
 
@@ -1993,114 +1994,335 @@ export default function Registro() {
 */}
 
       {/* Modal de selección de hijos */}
-      <AnimatePresence>
-        {showHijosModal && hijosRegistrados.length > 0 && (
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
+      {/* MODAL 1: Confirmar si quiere continuar o empezar de cero */}
+<AnimatePresence>
+  {showConfirmarModal && datosEncontrados.length > 0 && (
+    <motion.div
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      exit={{ opacity: 0 }}
+      style={{
+        position: "fixed", inset: 0, zIndex: 200,
+        background: "rgba(14,10,53,0.7)",
+        backdropFilter: "blur(14px)",
+        WebkitBackdropFilter: "blur(14px)",
+        display: "flex", alignItems: "center", justifyContent: "center",
+        padding: "1.5rem",
+      }}
+    >
+      <motion.div
+        initial={{ opacity: 0, y: 24, scale: 0.96 }}
+        animate={{ opacity: 1, y: 0, scale: 1 }}
+        exit={{ opacity: 0, y: 24, scale: 0.96 }}
+        transition={{ duration: 0.3, ease: [0.22, 1, 0.36, 1] }}
+        style={{
+          background: "#FFFFFF",
+          borderRadius: "28px",
+          padding: "2.5rem",
+          maxWidth: "480px",
+          width: "100%",
+          boxShadow: "0 40px 100px rgba(14,10,53,0.35)",
+        }}
+      >
+        <div
+          style={{
+            width: "56px",
+            height: "56px",
+            borderRadius: "50%",
+            background: C.panel,
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            marginBottom: "1.2rem",
+          }}
+        >
+          <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke={C.accent} strokeWidth="2">
+            <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
+            <circle cx="12" cy="7" r="4" />
+          </svg>
+        </div>
+
+        <h3
+          style={{
+            fontFamily: "'Montserrat', sans-serif",
+            fontWeight: 800,
+            fontSize: "1.5rem",
+            color: C.dark,
+            marginBottom: "0.5rem",
+          }}
+        >
+          Ya tienes un registro previo
+        </h3>
+
+        <p
+          style={{
+            fontFamily: "'Poppins', sans-serif",
+            fontSize: "0.92rem",
+            color: C.muted,
+            lineHeight: 1.6,
+            marginBottom: "1.5rem",
+          }}
+        >
+          Encontramos {datosEncontrados.length} aspirante(s) con este correo.
+          ¿Quieres continuar con uno de ellos o empezar desde cero?
+        </p>
+
+        <div style={{ display: "flex", flexDirection: "column", gap: "10px" }}>
+          {/* Botón: Continuar */}
+          <motion.button
+            whileHover={{ scale: 1.01 }}
+            whileTap={{ scale: 0.98 }}
+            onClick={() => {
+              setShowConfirmarModal(false);
+              setHijosRegistrados(datosEncontrados);
+              setShowHijosModal(true);
+            }}
             style={{
-              position: "fixed", inset: 0, zIndex: 200,
-              background: "rgba(14,10,53,0.6)", backdropFilter: "blur(12px)",
-              display: "flex", alignItems: "center", justifyContent: "center",
-              padding: "1.5rem",
+              all: "unset",
+              cursor: "pointer",
+              width: "100%",
+              textAlign: "center",
+              background: C.dark,
+              color: C.white,
+              fontFamily: "'Montserrat', sans-serif",
+              fontWeight: 700,
+              fontSize: "0.9rem",
+              padding: "0.9rem",
+              borderRadius: "12px",
+              transition: "all 0.15s",
             }}
           >
-            <motion.div
-              initial={{ opacity: 0, y: 24, scale: 0.97 }}
-              animate={{ opacity: 1, y: 0, scale: 1 }}
+            Continuar con registro previo
+          </motion.button>
+
+          {/* Botón: Empezar de cero */}
+          <motion.button
+            whileHover={{ scale: 1.01 }}
+            whileTap={{ scale: 0.98 }}
+            onClick={() => {
+              setShowConfirmarModal(false);
+              setDatosEncontrados([]);
+              setDir(1);
+              setStepIdx(3);
+            }}
+            style={{
+              all: "unset",
+              cursor: "pointer",
+              width: "100%",
+              textAlign: "center",
+              background: C.white,
+              color: C.body,
+              fontFamily: "'Montserrat', sans-serif",
+              fontWeight: 600,
+              fontSize: "0.9rem",
+              padding: "0.9rem",
+              borderRadius: "12px",
+              border: `1px solid ${C.line}`,
+              transition: "all 0.15s",
+            }}
+          >
+            Empezar desde cero
+          </motion.button>
+        </div>
+      </motion.div>
+    </motion.div>
+  )}
+</AnimatePresence>
+
+{/* MODAL 2: Selección de hijos (solo si eligió "Continuar") */}
+<AnimatePresence>
+  {showHijosModal && hijosRegistrados.length > 0 && (
+    <motion.div
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      exit={{ opacity: 0 }}
+      style={{
+        position: "fixed", inset: 0, zIndex: 210,
+        background: "rgba(14,10,53,0.7)",
+        backdropFilter: "blur(14px)",
+        WebkitBackdropFilter: "blur(14px)",
+        display: "flex", alignItems: "center", justifyContent: "center",
+        padding: "1.5rem",
+      }}
+    >
+      <motion.div
+        initial={{ opacity: 0, y: 24, scale: 0.96 }}
+        animate={{ opacity: 1, y: 0, scale: 1 }}
+        exit={{ opacity: 0, y: 24, scale: 0.96 }}
+        transition={{ duration: 0.3, ease: [0.22, 1, 0.36, 1] }}
+        style={{
+          background: "#FFFFFF",
+          borderRadius: "28px",
+          padding: "2.5rem",
+          maxWidth: "520px",
+          width: "100%",
+          maxHeight: "90vh",
+          overflowY: "auto",
+          boxShadow: "0 40px 100px rgba(14,10,53,0.35)",
+        }}
+      >
+        <div
+          style={{
+            width: "56px",
+            height: "56px",
+            borderRadius: "50%",
+            background: C.panel,
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            marginBottom: "1.2rem",
+          }}
+        >
+          <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke={C.accent} strokeWidth="2">
+            <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
+            <circle cx="12" cy="7" r="4" />
+          </svg>
+        </div>
+
+        <h3
+          style={{
+            fontFamily: "'Montserrat', sans-serif",
+            fontWeight: 800,
+            fontSize: "1.5rem",
+            color: C.dark,
+            marginBottom: "0.5rem",
+          }}
+        >
+          Selecciona el aspirante
+        </h3>
+
+        <p
+          style={{
+            fontFamily: "'Poppins', sans-serif",
+            fontSize: "0.92rem",
+            color: C.muted,
+            lineHeight: 1.6,
+            marginBottom: "1.5rem",
+          }}
+        >
+          Elige para qué hijo quieres continuar el proceso de admisión.
+        </p>
+
+        <div style={{ display: "flex", flexDirection: "column", gap: "8px", marginBottom: "1.5rem" }}>
+          {hijosRegistrados.map((hijo, index) => (
+            <motion.button
+              key={index}
+              whileHover={{ scale: 1.01 }}
+              whileTap={{ scale: 0.98 }}
+              onClick={() => {
+                setData(p => ({
+                  ...p,
+                  nombreAspirante: hijo["Nombres aspirante"] || "",
+                  apellidosAspirante: hijo["Apellidos aspirante"] || "",
+                  fechaNacimiento: hijo["Fecha nacimiento"] || "",
+                  edad: hijo["Edad"] || "",
+                  grado: hijo["Grado"] || "",
+                  colegioProcedencia: hijo["Colegio procedencia"] || "",
+                  nombrePadre: hijo["Nombres papá"] || "",
+                  apellidosPadre: hijo["Apellidos papá"] || "",
+                  correoPadre: hijo["Correo papá"] || "",
+                  celularPadre: hijo["Celular papá"] || "",
+                  nombreMadre: hijo["Nombres mamá"] || "",
+                  apellidosMadre: hijo["Apellidos mamá"] || "",
+                  correoMadre: hijo["Correo mamá"] || "",
+                  celularMadre: hijo["Celular mamá"] || "",
+                  nombreOtro: hijo["Nombres otro acudiente"] || "",
+                  apellidosOtro: hijo["Apellidos otro acudiente"] || "",
+                  correoOtro: hijo["Correo otro acudiente"] || "",
+                  celularOtro: hijo["Celular otro acudiente"] || "",
+                  motivacion: hijo["Motivación"] || "",
+                  canalEnterado: hijo["Canal de llegada"] || "",
+                  numeroAsistentes: hijo["Número asistentes"] || "",
+                  nombresAsistentes: hijo["Nombres asistentes"] || "",
+                  asistirOpenHouse: hijo["¿Asiste a Open House?"] === "Sí" ? true : (hijo["¿Asiste a Open House?"] === "No" ? false : null),
+                  continuarAdmision: hijo["¿Continúa a admisión?"] === "Sí" ? true : (hijo["¿Continúa a admisión?"] === "No" ? false : null),
+                  estudiaActual: hijo["¿Estudia actualmente?"] === "Sí" ? true : (hijo["¿Estudia actualmente?"] === "No" ? false : null),
+                }));
+                setShowHijosModal(false);
+                setDir(1);
+                setStepIdx(3);
+              }}
               style={{
-                background: "#FFFFFF", borderRadius: "24px",
-                padding: "2rem", maxWidth: "480px", width: "100%",
-                boxShadow: "0 32px 80px rgba(14,10,53,0.22)",
+                all: "unset",
+                cursor: "pointer",
+                width: "100%",
+                textAlign: "left",
+                background: C.bg,
+                border: `1px solid ${C.line}`,
+                borderRadius: "14px",
+                padding: "1rem 1.2rem",
+                transition: "all 0.15s",
               }}
             >
-              <h3 style={{ fontFamily: "'Montserrat', sans-serif", fontWeight: 800, fontSize: "1.3rem", color: "#21145F", marginBottom: "0.5rem" }}>
-                Ya tienes registros previos
-              </h3>
-              <p style={{ fontFamily: "'Poppins', sans-serif", fontSize: "0.85rem", color: "#9CA3AF", lineHeight: 1.65, marginBottom: "1.5rem" }}>
-                Encontramos {hijosRegistrados.length} aspirante(s) registrado(s) con este correo.
-                Selecciona para qué hijo quieres continuar el proceso.
-              </p>
-              
-              <div style={{ display: "flex", flexDirection: "column", gap: "8px", marginBottom: "1.5rem" }}>
-                {hijosRegistrados.map((hijo, index) => (
-                  <button
-                    key={index}
-                   onClick={() => {
-  // 1. Precargar datos
-  setData(p => ({
-    ...p,
-    nombreAspirante: hijo["Nombres aspirante"] || "",
-    apellidosAspirante: hijo["Apellidos aspirante"] || "",
-    fechaNacimiento: hijo["Fecha nacimiento"] || "",
-    edad: hijo["Edad"] || "",
-    grado: hijo["Grado"] || "",
-    colegioProcedencia: hijo["Colegio procedencia"] || "",
-    nombrePadre: hijo["Nombres papá"] || "",
-    apellidosPadre: hijo["Apellidos papá"] || "",
-    correoPadre: hijo["Correo papá"] || "",
-    celularPadre: hijo["Celular papá"] || "",
-    nombreMadre: hijo["Nombres mamá"] || "",
-    apellidosMadre: hijo["Apellidos mamá"] || "",
-    correoMadre: hijo["Correo mamá"] || "",
-    celularMadre: hijo["Celular mamá"] || "",
-    nombreOtro: hijo["Nombres otro acudiente"] || "",
-    apellidosOtro: hijo["Apellidos otro acudiente"] || "",
-    correoOtro: hijo["Correo otro acudiente"] || "",
-    celularOtro: hijo["Celular otro acudiente"] || "",
-    motivacion: hijo["Motivación"] || "",
-    canalEnterado: hijo["Canal de llegada"] || "",
-    numeroAsistentes: hijo["Número asistentes"] || "",
-    nombresAsistentes: hijo["Nombres asistentes"] || "",
-    asistirOpenHouse: hijo["¿Asiste a Open House?"] === "Sí" ? true : (hijo["¿Asiste a Open House?"] === "No" ? false : null),
-    continuarAdmision: hijo["¿Continúa a admisión?"] === "Sí" ? true : (hijo["¿Continúa a admisión?"] === "No" ? false : null),
-    estudiaActual: hijo["¿Estudia actualmente?"] === "Sí" ? true : (hijo["¿Estudia actualmente?"] === "No" ? false : null),
-  }));
-  
-  // 2. Cerrar el modal
-  setShowHijosModal(false);
-  
-  // 3. ✅ FORZAR AVANCE INMEDIATO al paso 3
-  setDir(1);
-  setStepIdx(3);
-}}
-                    style={{
-                      all: "unset", cursor: "pointer",
-                      width: "100%", textAlign: "left",
-                      background: "#F7F8FC", border: "1px solid #E8EAF0",
-                      borderRadius: "12px", padding: "1rem",
-                      transition: "all 0.15s",
-                    }}
-                  >
-                    <p style={{ fontFamily: "'Montserrat', sans-serif", fontWeight: 700, color: "#21145F" }}>
-                      {hijo["Nombres aspirante"]} {hijo["Apellidos aspirante"]}
-                    </p>
-                    <p style={{ fontFamily: "'Poppins', sans-serif", fontSize: "0.8rem", color: "#9CA3AF" }}>
-                      Grado: {hijo["Grado"]} · Estado: {hijo["Estado actual"] || "Registro recibido"}
-                    </p>
-                  </button>
-                ))}
-              </div>
-              
-              <button
-                onClick={() => setShowHijosModal(false)}
+              <p
                 style={{
-                  all: "unset", cursor: "pointer",
-                  width: "100%", textAlign: "center",
-                  fontFamily: "'Montserrat', sans-serif", fontWeight: 600,
-                  fontSize: "0.82rem", color: "#9CA3AF",
-                  padding: "0.8rem", borderRadius: "12px",
-                  border: "1px solid #E8EAF0",
+                  fontFamily: "'Montserrat', sans-serif",
+                  fontWeight: 700,
+                  fontSize: "1rem",
+                  color: C.dark,
                 }}
               >
-                Registrar un nuevo aspirante
-              </button>
-            </motion.div>
-          </motion.div>
-        )}
-      </AnimatePresence>
+                {hijo["Nombres aspirante"]} {hijo["Apellidos aspirante"]}
+              </p>
+              <p
+                style={{
+                  fontFamily: "'Poppins', sans-serif",
+                  fontSize: "0.78rem",
+                  color: C.muted,
+                  marginTop: "2px",
+                }}
+              >
+                Grado: {hijo["Grado"]} · Estado: {hijo["Estado actual"] || "Registro recibido"}
+              </p>
+              <div
+                style={{
+                  marginTop: "0.4rem",
+                  display: "flex",
+                  alignItems: "center",
+                  gap: "4px",
+                  color: C.accent,
+                  fontSize: "0.7rem",
+                  fontWeight: 600,
+                  fontFamily: "'Montserrat', sans-serif",
+                  letterSpacing: "0.06em",
+                  textTransform: "uppercase",
+                }}
+              >
+                <span>→</span>
+                <span>Continuar con este aspirante</span>
+              </div>
+            </motion.button>
+          ))}
+        </div>
 
+        <button
+          onClick={() => {
+            setShowHijosModal(false);
+            setDir(1);
+            setStepIdx(3);
+          }}
+          style={{
+            all: "unset",
+            cursor: "pointer",
+            width: "100%",
+            textAlign: "center",
+            fontFamily: "'Montserrat', sans-serif",
+            fontWeight: 600,
+            fontSize: "0.82rem",
+            color: C.muted,
+            padding: "0.8rem",
+            borderRadius: "12px",
+            border: `1px solid ${C.line}`,
+            background: C.white,
+            transition: "all 0.15s",
+          }}
+        >
+          Registrar un nuevo aspirante
+        </button>
+      </motion.div>
+    </motion.div>
+  )}
+</AnimatePresence>
       {/* Form content */}
       <div style={{
         paddingTop:"80px", paddingBottom:"100px",
