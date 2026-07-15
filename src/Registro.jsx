@@ -1701,15 +1701,6 @@ export default function Registro() {
     }
   }, [data, stepIdx]);
 
-  // ✅ Avanzar automáticamente cuando se precargan datos
-useEffect(() => {
-  // Si hay datos precargados y estamos en el paso 2 (correo), avanzar al paso 3
-  if (data.nombreAspirante && stepIdx === 2) {
-    console.log("🔄 Avanzando automáticamente al paso 3");
-    setDir(1);
-    setStepIdx(3);
-  }
-}, [data.nombreAspirante, stepIdx]);
 
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
@@ -2035,7 +2026,7 @@ useEffect(() => {
                   <button
                     key={index}
                    onClick={() => {
-  // ✅ SOLO precargar datos (sin avanzar manualmente)
+  // 1. Precargar datos
   setData(p => ({
     ...p,
     nombreAspirante: hijo["Nombres aspirante"] || "",
@@ -2065,8 +2056,12 @@ useEffect(() => {
     estudiaActual: hijo["¿Estudia actualmente?"] === "Sí" ? true : (hijo["¿Estudia actualmente?"] === "No" ? false : null),
   }));
   
-  // ✅ Cerrar el modal (el useEffect se encargará del avance)
+  // 2. Cerrar el modal
   setShowHijosModal(false);
+  
+  // 3. ✅ FORZAR AVANCE INMEDIATO al paso 3
+  setDir(1);
+  setStepIdx(3);
 }}
                     style={{
                       all: "unset", cursor: "pointer",
