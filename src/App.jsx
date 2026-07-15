@@ -582,15 +582,17 @@ function OpenHouseSection() {
               Si no pudiste asistir, aún estás a tiempo de iniciar el proceso de admisión. Nuestro equipo está listo para acompañarte y resolver todas tus dudas.
             </motion.p>
 
-            <motion.div
-          
-              <a
-              
-                Iniciar proceso de admisión
-              </a>
-
-            
-            </motion.div>
+            <motion.div variants={fadeUp}>
+  <a
+    href={FORM_URL}
+    whileHover={{ scale: 1.03 }}
+    whileTap={{ scale: 0.97 }}
+    className="inline-block px-8 py-4 rounded-full font-bold text-sm tracking-wide transition-all"
+    style={{ background: "#FFFFFF", color: "#21145F", fontFamily: "'Montserrat', sans-serif" }}
+  >
+    Iniciar proceso de admisión
+  </a>
+</motion.div>
           </div>
 
           <div>
