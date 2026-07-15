@@ -600,9 +600,7 @@ function OpenHouseSection() {
                 className="text-white/40 text-sm flex items-center gap-2"
                 style={{ fontFamily: "'Poppins', sans-serif" }}
               >
-                <span className="w-6 h-px bg-white/20" />
-                Sin costo de inscripción
-              </span>
+            
             </motion.div>
           </div>
 
@@ -646,7 +644,7 @@ function OpenHouseSection() {
               className="mt-4 p-4 rounded-2xl border border-white/10 bg-white/[0.04]"
             >
               <p className="text-white/50 text-xs leading-relaxed" style={{ fontFamily: "'Poppins', sans-serif" }}>
-                💡 El proceso de admisión continúa abierto. Puedes iniciarlo en cualquier momento.
+                El proceso de admisión continúa abierto. Puedes iniciarlo en cualquier momento.
               </p>
             </motion.div>
           </div>
