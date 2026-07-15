@@ -1380,6 +1380,22 @@ function AdmissionStatusModal({ open, onClose }) {
     
     if (resultado && resultado.success && resultado.data) {
       // ✅ FILTRAR: Solo mostrar registros con tipo de admisión
+      if (resultado && resultado.success && resultado.data) {
+  console.log("📦 DATOS RECIBIDOS:", resultado.data);
+  console.log("🔍 CAMPOS DEL PRIMER REGISTRO:", Object.keys(resultado.data[0] || {}));
+  
+  const tiposPermitidos = ['admision', 'admision_openhouse', 'openhouse_admision'];
+  const found = resultado.data.filter(item => {
+    console.log(`📌 Registro: ${item.aspirante}, tipoRegistro: "${item.tipoRegistro}"`);
+    const tipo = String(item.tipoRegistro || '').toLowerCase().trim();
+    return tiposPermitidos.includes(tipo);
+  });
+  
+  console.log("✅ FILTRADOS:", found);
+  setResults(found);
+  setSelected(found.length === 1 ? found[0] : null);
+  setSearched(true);
+}
       const tiposPermitidos = ['admision', 'admision_openhouse', 'openhouse_admision'];
       
       const found = resultado.data.filter(item => {
