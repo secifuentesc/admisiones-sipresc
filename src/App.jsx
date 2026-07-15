@@ -1355,69 +1355,57 @@ function AdmissionStatusModal({ open, onClose }) {
   }
 
   async function handleSearch(e) {
-  e.preventDefault();
+    e.preventDefault();
 
-  const q = normalize(query);
-  if (!q) return;
+    const q = normalize(query);
+    if (!q) return;
 
-  setLoading(true);
+    setLoading(true);
 
-  try {
-    const esCorreo = q.includes("@");
-    const esCelular = /^\d+$/.test(q);
-    
-    let resultado;
-    if (esCorreo) {
-      resultado = await consultarEstado(q, null);
-    } else if (esCelular) {
-      resultado = await consultarEstado(null, q);
-    } else {
-      setResults([]);
-      setSearched(true);
-      setLoading(false);
-      return;
-    }
-    
-    if (resultado && resultado.success && resultado.data) {
-      // ✅ FILTRAR: Solo mostrar registros con tipo de admisión
+    try {
+      const esCorreo = q.includes("@");
+      const esCelular = /^\d+$/.test(q);
+      
+      let resultado;
+      if (esCorreo) {
+        resultado = await consultarEstado(q, null);
+      } else if (esCelular) {
+        resultado = await consultarEstado(null, q);
+      } else {
+        setResults([]);
+        setSearched(true);
+        setLoading(false);
+        return;
+      }
+      
       if (resultado && resultado.success && resultado.data) {
-  console.log("📦 DATOS RECIBIDOS:", resultado.data);
-  console.log("🔍 CAMPOS DEL PRIMER REGISTRO:", Object.keys(resultado.data[0] || {}));
-  
-  const tiposPermitidos = ['admision', 'admision_openhouse', 'openhouse_admision'];
-  const found = resultado.data.filter(item => {
-    console.log(`📌 Registro: ${item.aspirante}, tipoRegistro: "${item.tipoRegistro}"`);
-    const tipo = String(item.tipoRegistro || '').toLowerCase().trim();
-    return tiposPermitidos.includes(tipo);
-  });
-  
-  console.log("✅ FILTRADOS:", found);
-  setResults(found);
-  setSelected(found.length === 1 ? found[0] : null);
-  setSearched(true);
-}
-      const tiposPermitidos = ['admision', 'admision_openhouse', 'openhouse_admision'];
-      
-      const found = resultado.data.filter(item => {
-        const tipo = String(item.tipoRegistro || '').toLowerCase().trim();
-        return tiposPermitidos.includes(tipo);
-      });
-      
-      setResults(found);
-      setSelected(found.length === 1 ? found[0] : null);
-      setSearched(true);
-    } else {
+        console.log("📦 DATOS RECIBIDOS:", resultado.data);
+        console.log("🔍 CAMPOS DEL PRIMER REGISTRO:", Object.keys(resultado.data[0] || {}));
+        
+        const tiposPermitidos = ['admision', 'admision_openhouse', 'openhouse_admision'];
+        const found = resultado.data.filter(item => {
+          console.log(`📌 Registro: ${item.aspirante}, tipoRegistro: "${item.tipoRegistro}"`);
+          const tipo = String(item.tipoRegistro || '').toLowerCase().trim();
+          return tiposPermitidos.includes(tipo);
+        });
+        
+        console.log("✅ FILTRADOS:", found);
+        setResults(found);
+        setSelected(found.length === 1 ? found[0] : null);
+        setSearched(true);
+      } else {
+        setResults([]);
+        setSearched(true);
+      }
+    } catch (error) {
+      console.error("Error al consultar:", error);
       setResults([]);
       setSearched(true);
+    } finally {
+      setLoading(false);
     }
-  } catch (error) {
-    console.error("Error al consultar:", error);
-    setResults([]);
-    setSearched(true);
-  } finally {
-    setLoading(false);
   }
-}
+
   function resetSearch() {
     setQuery("");
     setSearched(false);
