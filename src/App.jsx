@@ -1384,10 +1384,10 @@ function AdmissionStatusModal({ open, onClose }) {
         
         const tiposPermitidos = ['admision', 'admision_openhouse', 'openhouse_admision'];
         const found = resultado.data.filter(item => {
-          console.log(`📌 Registro: ${item.aspirante}, tipoRegistro: "${item.tipoRegistro}"`);
-          const tipo = String(item.tipoRegistro || '').toLowerCase().trim();
-          return tiposPermitidos.includes(tipo);
-        });
+  const tipo = String(item["Tipo de registro"] || '').toLowerCase().trim();
+  console.log(`📌 Registro: ${item["Nombres aspirante"] || "desconocido"}, tipo: "${tipo}"`);
+  return tiposPermitidos.includes(tipo);
+});
         
         console.log("✅ FILTRADOS:", found);
         setResults(found);
