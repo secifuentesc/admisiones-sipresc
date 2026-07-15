@@ -190,7 +190,7 @@ function AbstractBackground({ nivel }) {
 }
 
 // ─── TOPBAR ───────────────────────────────────────────────────────────────────
-function Topbar({ stepIdx, totalSteps, tipoRegistro }) {
+function Topbar({ stepIdx, totalSteps }) {
   const pct = totalSteps > 0 ? ((stepIdx + 1) / totalSteps) * 100 : 0;
   const stepLabel = totalSteps > 0
     ? `Paso ${stepIdx + 1} de ${totalSteps}`
@@ -233,21 +233,19 @@ function Topbar({ stepIdx, totalSteps, tipoRegistro }) {
           </div>
         </a>
 
-        {/* Paso + tipo */}
+        {/* Paso */}
         <div style={{ display:"flex", alignItems:"center", gap:"16px" }}>
-          {tipoRegistro && (
-            <span style={{
-              fontFamily:"'Montserrat', sans-serif",
-              fontSize:"0.6rem", fontWeight:700,
-              letterSpacing:"0.16em", textTransform:"uppercase",
-              color: C.accent,
-              background: C.panel,
-              padding:"0.3rem 0.8rem", borderRadius:"999px",
-              display: window.innerWidth < 480 ? "none" : "inline",
-            }}>
-              {tipoRegistro === "openhouse" ? "Open House" : tipoRegistro === "admision" ? "Admisión" : "Open House + Admisión"}
-            </span>
-          )}
+          <span style={{
+            fontFamily:"'Montserrat', sans-serif",
+            fontSize:"0.6rem", fontWeight:700,
+            letterSpacing:"0.16em", textTransform:"uppercase",
+            color: C.accent,
+            background: C.panel,
+            padding:"0.3rem 0.8rem", borderRadius:"999px",
+            display: window.innerWidth < 480 ? "none" : "inline",
+          }}>
+            Admisión
+          </span>
           {stepLabel && (
             <span style={{
               fontFamily:"'Montserrat', sans-serif",
@@ -283,7 +281,7 @@ function Topbar({ stepIdx, totalSteps, tipoRegistro }) {
 }
 
 // ─── UI COMPONENTS ────────────────────────────────────────────────────────────
-function FInput({ label, type="text", value, onChange, placeholder, required, hint, maxLength }) {
+function FInput({ label, type="text", value, onChange, placeholder, required, hint, maxLength, onBlur, readOnly }) {
   const [foc, setFoc] = useState(false);
   return (
     <div style={{ marginBottom:"1rem", width:"100%" }}>
@@ -301,15 +299,18 @@ function FInput({ label, type="text", value, onChange, placeholder, required, hi
       <input
         type={type} value={value} onChange={onChange}
         placeholder={placeholder} maxLength={maxLength}
-        onFocus={()=>setFoc(true)} onBlur={()=>setFoc(false)}
+        onFocus={()=>setFoc(true)} onBlur={()=>{setFoc(false); if(onBlur) onBlur();}}
+        readOnly={readOnly}
         style={{
           width:"100%", background: C.white,
           border:`2px solid ${foc ? C.accent : C.line}`,
           borderRadius:"14px", padding:"0.9rem 1.1rem",
           fontFamily:"'Poppins', sans-serif", fontWeight:400,
-          fontSize:"0.95rem", color: C.dark, outline:"none",
+          fontSize:"0.95rem", color: readOnly ? C.muted : C.dark,
+          outline:"none",
           transition:"border-color 0.15s, box-shadow 0.15s",
           boxShadow: foc ? `0 0 0 4px rgba(26,66,138,0.08)` : "none",
+          cursor: readOnly ? "default" : "text",
         }}
       />
       {hint && <p style={{ fontFamily:"'Poppins', sans-serif", fontSize:"0.72rem", color:C.muted, marginTop:"0.35rem" }}>{hint}</p>}
@@ -358,18 +359,13 @@ function FChoice({ title, sub, note, selected, onClick, disabled }) {
       whileTap={!disabled ? { scale:0.997 } : {}}
       onClick={!disabled ? onClick : undefined}
       style={{
-        // Elimina todos los estilos por defecto del botón
         all:"unset",
-        // Convierte en un flex container que respeta ancho
         display:"flex",
         alignItems:"center",
         gap:"1rem",
         width:"100%",
-        // Fuerza a no crecer más allá del contenedor
         maxWidth:"100%",
-        // El texto se alinea a la izquierda
         textAlign:"left",
-        // Estilos visuales
         cursor: disabled ? "default" : "pointer",
         background: selected ? C.panel : C.white,
         border:`2px solid ${selected ? C.accent : C.line}`,
@@ -379,13 +375,10 @@ function FChoice({ title, sub, note, selected, onClick, disabled }) {
         transition:"all 0.18s",
         boxShadow: selected ? `0 0 0 4px rgba(26,66,138,0.08)` : "0 1px 6px rgba(33,20,95,0.04)",
         opacity: disabled ? 0.5 : 1,
-        // Asegura que el botón no se estire más allá del contenedor padre
         boxSizing:"border-box",
-        // Importante: fuerza al botón a no superar el ancho del padre
         overflow:"hidden",
       }}
     >
-      {/* Círculo de radio */}
       <div style={{
         width:"22px", height:"22px", borderRadius:"50%", flexShrink:0,
         border:`2px solid ${selected ? C.accent : C.lineHov}`,
@@ -397,11 +390,9 @@ function FChoice({ title, sub, note, selected, onClick, disabled }) {
           <div style={{ width:"8px", height:"8px", borderRadius:"50%", background:C.white }} />
         )}
       </div>
-      {/* Contenedor del texto con flex:1 y minWidth:0 */}
       <div style={{
         flex:1,
         minWidth:0,
-        // Permite que el texto se ajuste al ancho disponible
         wordWrap:"break-word",
         overflowWrap:"break-word",
         wordBreak:"break-word",
@@ -412,7 +403,6 @@ function FChoice({ title, sub, note, selected, onClick, disabled }) {
           fontSize:"0.95rem",
           fontWeight:700,
           color: selected ? C.dark : C.body,
-          // Evita que el texto fuerce un ancho mayor
           maxWidth:"100%",
         }}>{title}</p>
         {sub && <p style={{ fontFamily:"'Poppins', sans-serif", fontSize:"0.8rem", color:C.muted, marginTop:"0.2rem", lineHeight:1.5 }}>{sub}</p>}
@@ -454,7 +444,6 @@ function FFile({ label, fieldKey, files, setFiles, required, maxMB = 30, datosAs
   const [uploading, setUploading] = useState(false);
   const [uploaded, setUploaded] = useState(false);
 
-  // Si ya tiene link guardado, marcarlo como subido
   useEffect(() => {
     if (files[`${fieldKey}_link`]) setUploaded(true);
   }, []);
@@ -463,13 +452,11 @@ function FFile({ label, fieldKey, files, setFiles, required, maxMB = 30, datosAs
     const f = e.target.files[0];
     if (!f) return;
 
-    // Validar tamaño
     if (f.size > maxMB * 1024 * 1024) {
       setError(`El archivo supera el límite de ${maxMB}MB. Por favor comprime el documento e intenta de nuevo.`);
       return;
     }
 
-    // Validar tipo
     const tiposValidos = ['application/pdf', 'image/jpeg', 'image/jpg', 'image/png'];
     if (!tiposValidos.includes(f.type) && !f.name.match(/\.(pdf|jpg|jpeg|png)$/i)) {
       setError("Solo se permiten archivos PDF, JPG o PNG.");
@@ -523,7 +510,6 @@ function FFile({ label, fieldKey, files, setFiles, required, maxMB = 30, datosAs
             <span style={{ fontFamily: "'Montserrat', sans-serif", fontSize: "0.55rem", fontWeight: 700, letterSpacing: "0.14em", textTransform: "uppercase", color: required ? C.accent : C.muted, background: required ? C.panel : "#F3F4F6", padding: "0.18rem 0.55rem", borderRadius: "999px", border: required ? `1px solid rgba(26,66,138,0.2)` : "1px solid #E5E7EB" }}>{required ? "Requerido" : "Opcional"}</span>
           </div>
 
-          {/* Estado: sin archivo */}
           {!file && !uploading && (
             <label htmlFor={id} style={{ display: "flex", alignItems: "center", gap: "10px", cursor: "pointer", background: C.bg, border: `2px dashed ${error ? "#EF4444" : C.line}`, borderRadius: "12px", padding: "0.8rem 1rem", transition: "border-color 0.15s" }}>
               <svg width="16" height="16" viewBox="0 0 20 20" fill="none" stroke={C.muted} strokeWidth="1.8" strokeLinecap="round"><path d="M10 13V3m-4 4l4-4 4 4" /><path d="M3 17h14" /></svg>
@@ -533,7 +519,6 @@ function FFile({ label, fieldKey, files, setFiles, required, maxMB = 30, datosAs
             </label>
           )}
 
-          {/* Estado: subiendo */}
           {uploading && (
             <div style={{ display: "flex", alignItems: "center", gap: "10px", background: C.panel, border: `1.5px solid ${C.lineHov}`, borderRadius: "12px", padding: "0.75rem 1rem" }}>
               <svg width="16" height="16" viewBox="0 0 20 20" fill="none" stroke={C.accent} strokeWidth="1.8" strokeLinecap="round"><path d="M10 13V3m-4 4l4-4 4 4" /><path d="M3 17h14" /></svg>
@@ -541,7 +526,6 @@ function FFile({ label, fieldKey, files, setFiles, required, maxMB = 30, datosAs
             </div>
           )}
 
-          {/* Estado: subido exitosamente */}
           {uploaded && file && !uploading && (
             <div style={{ display: "flex", alignItems: "center", gap: "10px", background: "#F0FDF4", border: "1.5px solid #86EFAC", borderRadius: "12px", padding: "0.75rem 1rem" }}>
               <svg width="16" height="16" viewBox="0 0 20 20" fill="none" stroke="#16A34A" strokeWidth="1.8" strokeLinecap="round"><path d="M14 2H6a2 2 0 00-2 2v12a2 2 0 002 2h8a2 2 0 002-2V4a2 2 0 00-2-2z" /><path d="M8 10h4M8 13h2" /></svg>
@@ -802,81 +786,7 @@ function StepTitle({ badge, title, sub }) {
 
 // ─── STEPS ───────────────────────────────────────────────────────────────────
 
-// 0 — TIPO
-function StepTipo({ data, setData }) {
-  return (
-    <>
-      <StepTitle
-        badge="Admisiones 2027 · Open House 11 de julio"
-        title="¿Cómo quieres comenzar?"
-        sub="Elige el camino que mejor se adapta a tu familia."
-      />
-
-      <FChoice
-        title="Asistir al Open House"
-        sub="Visita el colegio el 11 de julio, conoce los espacios y el equipo. Sin costo, sin documentos."
-        note="Solo necesitas reservar tu lugar"
-        selected={data.tipoRegistro === "openhouse"}
-        onClick={() => setData(p => ({ ...p, tipoRegistro:"openhouse" }))}
-      />
-      <FChoice
-        title="Iniciar proceso de admisión"
-        sub="Comienza formalmente la inscripción con pago de derechos y documentos requeridos."
-        note="Derecho de admisión: $40.000"
-        selected={data.tipoRegistro === "admision"}
-        onClick={() => setData(p => ({ ...p, tipoRegistro:"admision" }))}
-      />
-
-      {/* Info pago si elige admisión */}
-      <AnimatePresence>
-        {data.tipoRegistro === "admision" && (
-          <motion.div
-            initial={{ opacity:0, height:0 }} animate={{ opacity:1, height:"auto" }}
-            exit={{ opacity:0, height:0 }} style={{ overflow:"hidden" }}
-          >
-            <div style={{
-              background: C.night, borderRadius:"16px",
-              padding:"1.4rem 1.6rem", marginTop:"0.5rem",
-            }}>
-              <p style={{ fontFamily:"'Montserrat', sans-serif", fontSize:"0.58rem", fontWeight:700, color:"rgba(255,255,255,0.4)", letterSpacing:"0.2em", textTransform:"uppercase", marginBottom:"0.5rem" }}>Pago previo al registro</p>
-              <p style={{ fontFamily:"'Montserrat', sans-serif", fontWeight:900, fontSize:"2.2rem", color:C.white, lineHeight:1, marginBottom:"0.75rem" }}>$40.000</p>
-              <p style={{ fontFamily:"'Poppins', sans-serif", fontSize:"0.8rem", color:"rgba(255,255,255,0.5)", lineHeight:1.6 }}>
-                Cuenta de ahorros Bancolombia No. 39900005178 a nombre de <br/>
-                <strong style={{ color:C.white }}>Instituto Parroquial Nuestra Señora de la Presentación</strong>
-              </p>
-              <div style={{ height:"1px", background:"rgba(255,255,255,0.08)", margin:"1rem 0" }} />
-              <p style={{ fontFamily:"'Montserrat', sans-serif", fontSize:"0.58rem", fontWeight:700, color:"rgba(255,255,255,0.4)", letterSpacing:"0.2em", textTransform:"uppercase", marginBottom:"0.6rem" }}>Ten listos estos documentos</p>
-              {["Comprobante de pago","Registro civil del aspirante","Último informe académico","Ficha de seguimiento u hoja de vida","Paz y salvo del colegio anterior"].map(d => (
-                <div key={d} style={{ display:"flex", alignItems:"center", gap:"8px", marginBottom:"0.35rem" }}>
-                  <div style={{ width:"4px", height:"4px", borderRadius:"50%", background:C.gold, flexShrink:0 }} />
-                  <p style={{ fontFamily:"'Poppins', sans-serif", fontSize:"0.78rem", color:"rgba(255,255,255,0.45)" }}>{d}</p>
-                </div>
-              ))}
-            </div>
-          </motion.div>
-        )}
-        {data.tipoRegistro === "openhouse" && (
-          <motion.div
-            initial={{ opacity:0, height:0 }} animate={{ opacity:1, height:"auto" }}
-            exit={{ opacity:0, height:0 }} style={{ overflow:"hidden" }}
-          >
-            <div style={{
-              background:"rgba(26,66,138,0.06)", borderRadius:"14px",
-              border:`1px solid rgba(26,66,138,0.15)`,
-              padding:"1rem 1.3rem", marginTop:"0.5rem",
-            }}>
-              <p style={{ fontFamily:"'Poppins', sans-serif", fontSize:"0.85rem", color:C.accent, lineHeight:1.65 }}>
-                Sin costo ni documentos. Tu lugar queda reservado de inmediato. Puedes iniciar el proceso de admisión después del Open House.
-              </p>
-            </div>
-          </motion.div>
-        )}
-      </AnimatePresence>
-    </>
-  );
-}
-
-// 1 — POLÍTICA
+// 0 — POLÍTICA (ahora es el primer paso)
 function StepPolitica({ data, setData }) {
   return (
     <>
@@ -913,7 +823,7 @@ function StepPolitica({ data, setData }) {
   );
 }
 
-// 2 — CORREO
+// 1 — CORREO
 function StepCorreo({ data, setData, onProgressRestore }) {
   const [checking, setChecking] = useState(false);
   const showOwner = data.correo.includes("@");
@@ -972,7 +882,7 @@ function StepCorreo({ data, setData, onProgressRestore }) {
   );
 }
 
-// 3 — ASPIRANTE
+// 2 — ASPIRANTE
 function StepAspirante({ data, setData }) {
   const [dia, setDia] = useState("");
   const [mes, setMes] = useState("");
@@ -1111,7 +1021,7 @@ function StepAspirante({ data, setData }) {
   );
 }
 
-// 4 — GRADO
+// 3 — GRADO
 function StepGrado({ data, setData }) {
   const niveles = ["Preescolar","Primaria","Secundaria"];
   const nColors = NIVEL_COLOR;
@@ -1167,7 +1077,7 @@ function StepGrado({ data, setData }) {
   );
 }
 
-// 5 — ESTUDIA ACTUAL (solo preescolar)
+// 4 — ESTUDIA ACTUAL (solo preescolar)
 function StepEstudiaActual({ data, setData }) {
   return (
     <>
@@ -1186,7 +1096,7 @@ function StepEstudiaActual({ data, setData }) {
   );
 }
 
-// 6 — COLEGIO (no preescolar)
+// 5 — COLEGIO (no preescolar)
 function StepColegio({ data, setData }) {
   return (
     <>
@@ -1199,265 +1109,7 @@ function StepColegio({ data, setData }) {
   );
 }
 
-// 7 — PAPÁ
-function StepPapa({ data, setData }) {
-  return (
-    <>
-      <StepTitle badge="Datos del padre" title="Información del papá" sub="Esta información es el canal principal de comunicación del proceso." />
-      <FInput label="Apellidos" value={data.apellidosPadre} onChange={e=>setData(p=>({...p,apellidosPadre:e.target.value}))} placeholder="Ej. Pérez García" required />
-      <FInput label="Nombres" value={data.nombrePadre} onChange={e=>setData(p=>({...p,nombrePadre:e.target.value}))} placeholder="Ej. Carlos Alberto" required />
-      <FInput label="Correo electrónico" type="email" value={data.correoPadre} onChange={e=>setData(p=>({...p,correoPadre:e.target.value}))} placeholder="correo@ejemplo.com" required hint="Recibirá información importante del proceso en este correo." />
-      <FInput label="Celular" type="tel" value={data.celularPadre} onChange={e=>setData(p=>({...p,celularPadre:e.target.value}))} placeholder="3XX XXX XXXX" required />
-    </>
-  );
-}
-
-// 8 — MAMÁ
-function StepMama({ data, setData }) {
-  return (
-    <>
-      <StepTitle badge="Datos de la madre" title="Información de la mamá" sub="Ambos acudientes recibirán la información del proceso." />
-      <FInput label="Apellidos" value={data.apellidosMadre} onChange={e=>setData(p=>({...p,apellidosMadre:e.target.value}))} placeholder="Ej. Gómez Vargas" required />
-      <FInput label="Nombres" value={data.nombreMadre} onChange={e=>setData(p=>({...p,nombreMadre:e.target.value}))} placeholder="Ej. Laura Marcela" required />
-      <FInput label="Correo electrónico" type="email" value={data.correoMadre} onChange={e=>setData(p=>({...p,correoMadre:e.target.value}))} placeholder="correo@ejemplo.com" required hint="Recibirá información importante del proceso en este correo." />
-      <FInput label="Celular" type="tel" value={data.celularMadre} onChange={e=>setData(p=>({...p,celularMadre:e.target.value}))} placeholder="3XX XXX XXXX" required />
-    </>
-  );
-}
-
-// 9 — MOTIVACIÓN + CANAL
-function StepMotivacion({ data, setData }) {
-  const canales = ["Redes sociales del colegio","Correo electrónico","Recomendación de un conocido","Otro"];
-  return (
-    <>
-      <StepTitle badge="Cuéntanos" title="¿Qué te motiva a ser parte de la Familia Presentación?" sub="Queremos conocerte mejor antes de recibirte." />
-      <FTextarea
-        value={data.motivacion}
-        onChange={e=>setData(p=>({...p,motivacion:e.target.value}))}
-        placeholder="Cuéntanos qué te inspira de nuestro colegio, qué esperas encontrar, qué valoras en una institución educativa..."
-        required
-      />
-      <div style={{ marginTop:"1.5rem" }}>
-        <p style={{ fontFamily:"'Montserrat', sans-serif", fontSize:"0.62rem", fontWeight:700, color:C.muted, letterSpacing:"0.18em", textTransform:"uppercase", marginBottom:"0.75rem" }}>
-          ¿Cómo se enteraron del evento? <span style={{ color:C.accent }}>*</span>
-        </p>
-        <div style={{ display:"flex", flexWrap:"wrap", gap:"8px" }}>
-          {canales.map(c => (
-            <FChip key={c} label={c} selected={data.canalEnterado === c} onClick={() => setData(p=>({...p,canalEnterado:c}))} />
-          ))}
-        </div>
-      </div>
-    </>
-  );
-}
-
-// 10 — OPEN HOUSE (asistentes)
-function StepOpenHouse({ data, setData }) {
-  return (
-    <>
-      <StepTitle
-        badge="Open House · 11 de julio"
-        title="¿Cuántos asistirán?"
-        sub="Máximo 3 personas por registro."
-      />
-      <div style={{ display:"flex", gap:"10px", marginBottom:"1.5rem" }}>
-        {["1","2","3"].map(n => (
-          <FChip key={n} label={`${n} ${n==="1"?"persona":"personas"}`} selected={data.numeroAsistentes === n} onClick={() => setData(p=>({...p,numeroAsistentes:n}))} />
-        ))}
-      </div>
-      {data.numeroAsistentes && (
-        <motion.div initial={{ opacity:0, y:8 }} animate={{ opacity:1, y:0 }}>
-          <FInput
-            label="Nombres completos de los asistentes"
-            value={data.nombresAsistentes}
-            onChange={e=>setData(p=>({...p,nombresAsistentes:e.target.value}))}
-            placeholder="Ej. Ana Pérez, Juan Gómez, Laura Torres"
-            hint="Sepáralos con comas"
-            required
-          />
-        </motion.div>
-      )}
-    </>
-  );
-}
-
-// 11 — PAGO (solo admisión)
-function StepPago({ files, setFiles, data }) {
-  return (
-    <>
-      <StepTitle badge="Pago" title="Comprobante de pago" sub="Sube el comprobante de la consignación de $40.000 a Bancolombia." />
-      <div style={{ background:C.night, borderRadius:"16px", padding:"1.4rem 1.6rem", marginBottom:"1.5rem" }}>
-        <p style={{ fontFamily:"'Montserrat', sans-serif", fontSize:"0.58rem", fontWeight:700, color:"rgba(255,255,255,0.4)", letterSpacing:"0.2em", textTransform:"uppercase", marginBottom:"0.4rem" }}>Valor</p>
-        <p style={{ fontFamily:"'Montserrat', sans-serif", fontWeight:900, fontSize:"2.4rem", color:C.white, lineHeight:1, marginBottom:"0.75rem" }}>$40.000</p>
-        <p style={{ fontFamily:"'Poppins', sans-serif", fontSize:"0.78rem", color:"rgba(255,255,255,0.45)", lineHeight:1.6 }}>
-          Cuenta de ahorros Bancolombia No. 39900005178 a nombre de <br/>
-          <strong style={{ color:C.white }}>Instituto Parroquial Nuestra Señora de la Presentación</strong>
-        </p>
-      </div>
-      <FFile label="Comprobante de pago" fieldKey="comprobantePago" files={files} setFiles={setFiles} required datosAspirante={data} />
-    </>
-  );
-}
-
-// 12 — DOCUMENTOS (solo admisión)
-function StepDocumentos({ files, setFiles, data }) {
-  const docs = [
-    { key:"registroCivil", label:"Registro civil del aspirante", required:true },
-    { key:"informeAcademico", label:"Último informe académico", required:true },
-    { key:"fichaSeguimiento", label:"Ficha de seguimiento u hoja de vida", required:true },
-    { key:"pazYSalvo", label:"Paz y salvo del colegio anterior", required:true },
-  ];
-  return (
-    <>
-      <StepTitle badge="Documentos" title="Documentos requeridos" sub="Sube los documentos del aspirante. Puedes subir PDF, JPG o PNG." />
-      {docs.map(d => (
-        <FFile key={d.key} label={d.label} fieldKey={d.key} files={files} setFiles={setFiles} required={d.required} datosAspirante={data} />
-      ))}
-    </>
-  );
-}
-
-// 13 — ¿INICIAR ADMISIÓN AHORA? (solo open house, al final)
-function StepContinuarAdmision({ data, setData }) {
-  return (
-    <>
-      <StepTitle
-        badge="Un paso más"
-        title="¿Deseas iniciar el proceso de admisión ahora?"
-        sub="Ya tenemos tus datos. Puedes continuar con la inscripción formal o hacerlo después del Open House."
-      />
-      <FChoice
-        title="Sí, quiero iniciar la admisión ahora"
-        sub="Completarás el pago y documentos. Tu información ya está guardada."
-        note="Derecho de admisión: $40.000"
-        selected={data.continuarAdmision === true}
-        onClick={() => setData(p=>({...p,continuarAdmision:true}))}
-      />
-      <FChoice
-        title="Lo haré después del Open House"
-        sub="Recibirás información por correo para continuar cuando estés listo."
-        selected={data.continuarAdmision === false}
-        onClick={() => setData(p=>({...p,continuarAdmision:false}))}
-      />
-    </>
-  );
-}
-
-// 14 — OPEN HOUSE DESDE ADMISIÓN
-function StepOpenHouseAdmision({ data, setData }) {
-  return (
-    <>
-      <StepTitle
-        badge="Open House · 11 de julio"
-        title="¿Te gustaría asistir al Open House?"
-        sub="Es gratuito. Puedes venir con hasta 3 personas de tu familia."
-      />
-      <FChoice title="Sí, quiero asistir al Open House" selected={data.asistirOpenHouse === true} onClick={() => setData(p=>({...p,asistirOpenHouse:true}))} />
-      <FChoice title="No, gracias" selected={data.asistirOpenHouse === false} onClick={() => setData(p=>({...p,asistirOpenHouse:false,numeroAsistentes:"",nombresAsistentes:""}))} />
-      {data.asistirOpenHouse === true && (
-        <motion.div initial={{ opacity:0, y:8 }} animate={{ opacity:1, y:0 }} style={{ marginTop:"0.5rem" }}>
-          <div style={{ display:"flex", gap:"10px", marginBottom:"1rem" }}>
-            {["1","2","3"].map(n => (
-              <FChip key={n} label={`${n} ${n==="1"?"persona":"personas"}`} selected={data.numeroAsistentes === n} onClick={() => setData(p=>({...p,numeroAsistentes:n}))} />
-            ))}
-          </div>
-          {data.numeroAsistentes && (
-            <FInput
-              label="Nombres completos de los asistentes"
-              value={data.nombresAsistentes}
-              onChange={e=>setData(p=>({...p,nombresAsistentes:e.target.value}))}
-              placeholder="Ej. Ana Pérez, Juan Gómez"
-              hint="Sepáralos con comas"
-            />
-          )}
-        </motion.div>
-      )}
-    </>
-  );
-}
-
-// 15 — RESUMEN
-function StepResumen({ data, files, modo }) {
-  const includeAdmision = modo === "admision" || data.continuarAdmision === true;
-  const includeOH = modo === "openhouse" || data.asistirOpenHouse === true;
-
-  const Row = ({ label, value }) => value ? (
-    <div style={{ display:"flex", justifyContent:"space-between", alignItems:"flex-start", padding:"0.75rem 1.2rem", borderBottom:`1px solid ${C.line}` }}>
-      <span style={{ fontFamily:"'Montserrat', sans-serif", fontSize:"0.65rem", fontWeight:700, color:C.muted, textTransform:"uppercase", letterSpacing:"0.12em", flexShrink:0, marginRight:"1rem" }}>{label}</span>
-      <span style={{ fontFamily:"'Poppins', sans-serif", fontSize:"0.85rem", color:C.dark, fontWeight:500, textAlign:"right" }}>{value}</span>
-    </div>
-  ) : null;
-
-  const docsCount = ["comprobantePago","registroCivil","informeAcademico","fichaSeguimiento","pazYSalvo"].filter(k=>files[k]).length;
-
-  return (
-    <>
-      <StepTitle badge="Casi listo" title="Revisa tu registro" sub="Confirma que toda la información esté correcta antes de enviar." />
-
-      {/* Aspirante */}
-      <div style={{ background:C.white, border:`1px solid ${C.line}`, borderRadius:"16px", overflow:"hidden", marginBottom:"1rem" }}>
-        <div style={{ background:C.panel, padding:"0.65rem 1.2rem" }}>
-          <p style={{ fontFamily:"'Montserrat', sans-serif", fontSize:"0.6rem", fontWeight:800, color:C.accent, letterSpacing:"0.18em", textTransform:"uppercase" }}>Aspirante</p>
-        </div>
-        <Row label="Nombre" value={`${data.nombreAspirante} ${data.apellidosAspirante}`} />
-        <Row label="Nacimiento" value={data.fechaNacimiento} />
-        <Row label="Edad" value={data.edad ? `${data.edad} años` : null} />
-        <Row label="Grado" value={data.grado} />
-        <Row label="Colegio actual" value={data.colegioProcedencia || (data.estudiaActual === false ? "No estudia actualmente" : null)} />
-      </div>
-
-      {/* Papá */}
-      <div style={{ background:C.white, border:`1px solid ${C.line}`, borderRadius:"16px", overflow:"hidden", marginBottom:"1rem" }}>
-        <div style={{ background:C.panel, padding:"0.65rem 1.2rem" }}>
-          <p style={{ fontFamily:"'Montserrat', sans-serif", fontSize:"0.6rem", fontWeight:800, color:C.accent, letterSpacing:"0.18em", textTransform:"uppercase" }}>Padre</p>
-        </div>
-        <Row label="Nombre" value={`${data.nombrePadre} ${data.apellidosPadre}`} />
-        <Row label="Correo" value={data.correoPadre} />
-        <Row label="Celular" value={data.celularPadre} />
-      </div>
-
-      {/* Mamá */}
-      <div style={{ background:C.white, border:`1px solid ${C.line}`, borderRadius:"16px", overflow:"hidden", marginBottom:"1rem" }}>
-        <div style={{ background:C.panel, padding:"0.65rem 1.2rem" }}>
-          <p style={{ fontFamily:"'Montserrat', sans-serif", fontSize:"0.6rem", fontWeight:800, color:C.accent, letterSpacing:"0.18em", textTransform:"uppercase" }}>Madre</p>
-        </div>
-        <Row label="Nombre" value={`${data.nombreMadre} ${data.apellidosMadre}`} />
-        <Row label="Correo" value={data.correoMadre} />
-        <Row label="Celular" value={data.celularMadre} />
-      </div>
-
-      {/* Open House */}
-      {includeOH && (
-        <div style={{ background:C.white, border:`1px solid ${C.line}`, borderRadius:"16px", overflow:"hidden", marginBottom:"1rem" }}>
-          <div style={{ background:"#FFFBEB", padding:"0.65rem 1.2rem" }}>
-            <p style={{ fontFamily:"'Montserrat', sans-serif", fontSize:"0.6rem", fontWeight:800, color:"#92400E", letterSpacing:"0.18em", textTransform:"uppercase" }}>Open House · 11 julio</p>
-          </div>
-          <Row label="Asistentes" value={data.numeroAsistentes ? `${data.numeroAsistentes} persona(s)` : null} />
-          <Row label="Nombres" value={data.nombresAsistentes} />
-        </div>
-      )}
-
-      {/* Admisión */}
-      {includeAdmision && (
-        <div style={{ background:C.white, border:`1px solid ${C.line}`, borderRadius:"16px", overflow:"hidden", marginBottom:"1rem" }}>
-          <div style={{ background:C.night, padding:"0.65rem 1.2rem" }}>
-            <p style={{ fontFamily:"'Montserrat', sans-serif", fontSize:"0.6rem", fontWeight:800, color:"rgba(255,255,255,0.7)", letterSpacing:"0.18em", textTransform:"uppercase" }}>Proceso de admisión</p>
-          </div>
-          <div style={{ padding:"0.75rem 1.2rem" }}>
-            <p style={{ fontFamily:"'Poppins', sans-serif", fontSize:"0.85rem", color:C.accent }}>
-              {docsCount} documento(s) adjunto(s)
-            </p>
-          </div>
-        </div>
-      )}
-
-      <p style={{ fontFamily:"'Poppins', sans-serif", fontSize:"0.78rem", color:C.muted, lineHeight:1.65 }}>
-        Al enviar este registro, el equipo de admisiones se comunicará contigo a través de los correos y celulares registrados.
-      </p>
-    </>
-  );
-}
-
+// 6 — ACUDIENTES
 function StepAcudientes({ data, setData }) {
   const toggle = (id) => {
     const cur = data.acudientesSeleccionados || [];
@@ -1524,6 +1176,146 @@ function StepAcudientes({ data, setData }) {
   );
 }
 
+// 7 — MOTIVACIÓN + CANAL
+function StepMotivacion({ data, setData }) {
+  const canales = ["Redes sociales del colegio","Correo electrónico","Recomendación de un conocido","Otro"];
+  return (
+    <>
+      <StepTitle badge="Cuéntanos" title="¿Qué te motiva a ser parte de la Familia Presentación?" sub="Queremos conocerte mejor antes de recibirte." />
+      <FTextarea
+        value={data.motivacion}
+        onChange={e=>setData(p=>({...p,motivacion:e.target.value}))}
+        placeholder="Cuéntanos qué te inspira de nuestro colegio, qué esperas encontrar, qué valoras en una institución educativa..."
+        required
+      />
+      <div style={{ marginTop:"1.5rem" }}>
+        <p style={{ fontFamily:"'Montserrat', sans-serif", fontSize:"0.62rem", fontWeight:700, color:C.muted, letterSpacing:"0.18em", textTransform:"uppercase", marginBottom:"0.75rem" }}>
+          ¿Cómo se enteraron del proceso de admisión? <span style={{ color:C.accent }}>*</span>
+        </p>
+        <div style={{ display:"flex", flexWrap:"wrap", gap:"8px" }}>
+          {canales.map(c => (
+            <FChip key={c} label={c} selected={data.canalEnterado === c} onClick={() => setData(p=>({...p,canalEnterado:c}))} />
+          ))}
+        </div>
+      </div>
+    </>
+  );
+}
+
+// 8 — PAGO
+function StepPago({ files, setFiles, data }) {
+  return (
+    <>
+      <StepTitle badge="Pago" title="Comprobante de pago" sub="Sube el comprobante de la consignación de $40.000 a Bancolombia." />
+      <div style={{ background:C.night, borderRadius:"16px", padding:"1.4rem 1.6rem", marginBottom:"1.5rem" }}>
+        <p style={{ fontFamily:"'Montserrat', sans-serif", fontSize:"0.58rem", fontWeight:700, color:"rgba(255,255,255,0.4)", letterSpacing:"0.2em", textTransform:"uppercase", marginBottom:"0.4rem" }}>Valor</p>
+        <p style={{ fontFamily:"'Montserrat', sans-serif", fontWeight:900, fontSize:"2.4rem", color:C.white, lineHeight:1, marginBottom:"0.75rem" }}>$40.000</p>
+        <p style={{ fontFamily:"'Poppins', sans-serif", fontSize:"0.78rem", color:"rgba(255,255,255,0.45)", lineHeight:1.6 }}>
+          Cuenta de ahorros Bancolombia No. 39900005178 a nombre de <br/>
+          <strong style={{ color:C.white }}>Instituto Parroquial Nuestra Señora de la Presentación</strong>
+        </p>
+      </div>
+      <FFile label="Comprobante de pago" fieldKey="comprobantePago" files={files} setFiles={setFiles} required datosAspirante={data} />
+    </>
+  );
+}
+
+// 9 — DOCUMENTOS
+function StepDocumentos({ files, setFiles, data }) {
+  const docs = [
+    { key:"registroCivil", label:"Registro civil del aspirante", required:true },
+    { key:"informeAcademico", label:"Último informe académico", required:true },
+    { key:"fichaSeguimiento", label:"Ficha de seguimiento u hoja de vida", required:true },
+    { key:"pazYSalvo", label:"Paz y salvo del colegio anterior", required:true },
+  ];
+  return (
+    <>
+      <StepTitle badge="Documentos" title="Documentos requeridos" sub="Sube los documentos del aspirante. Puedes subir PDF, JPG o PNG." />
+      {docs.map(d => (
+        <FFile key={d.key} label={d.label} fieldKey={d.key} files={files} setFiles={setFiles} required={d.required} datosAspirante={data} />
+      ))}
+    </>
+  );
+}
+
+// 10 — RESUMEN
+function StepResumen({ data, files }) {
+  const Row = ({ label, value }) => value ? (
+    <div style={{ display:"flex", justifyContent:"space-between", alignItems:"flex-start", padding:"0.75rem 1.2rem", borderBottom:`1px solid ${C.line}` }}>
+      <span style={{ fontFamily:"'Montserrat', sans-serif", fontSize:"0.65rem", fontWeight:700, color:C.muted, textTransform:"uppercase", letterSpacing:"0.12em", flexShrink:0, marginRight:"1rem" }}>{label}</span>
+      <span style={{ fontFamily:"'Poppins', sans-serif", fontSize:"0.85rem", color:C.dark, fontWeight:500, textAlign:"right" }}>{value}</span>
+    </div>
+  ) : null;
+
+  const docsCount = ["comprobantePago","registroCivil","informeAcademico","fichaSeguimiento","pazYSalvo"].filter(k=>files[k]).length;
+
+  return (
+    <>
+      <StepTitle badge="Casi listo" title="Revisa tu registro" sub="Confirma que toda la información esté correcta antes de enviar." />
+
+      {/* Aspirante */}
+      <div style={{ background:C.white, border:`1px solid ${C.line}`, borderRadius:"16px", overflow:"hidden", marginBottom:"1rem" }}>
+        <div style={{ background:C.panel, padding:"0.65rem 1.2rem" }}>
+          <p style={{ fontFamily:"'Montserrat', sans-serif", fontSize:"0.6rem", fontWeight:800, color:C.accent, letterSpacing:"0.18em", textTransform:"uppercase" }}>Aspirante</p>
+        </div>
+        <Row label="Nombre" value={`${data.nombreAspirante} ${data.apellidosAspirante}`} />
+        <Row label="Nacimiento" value={data.fechaNacimiento} />
+        <Row label="Edad" value={data.edad ? `${data.edad} años` : null} />
+        <Row label="Grado" value={data.grado} />
+        <Row label="Colegio actual" value={data.colegioProcedencia || (data.estudiaActual === false ? "No estudia actualmente" : null)} />
+      </div>
+
+      {/* Papá */}
+      <div style={{ background:C.white, border:`1px solid ${C.line}`, borderRadius:"16px", overflow:"hidden", marginBottom:"1rem" }}>
+        <div style={{ background:C.panel, padding:"0.65rem 1.2rem" }}>
+          <p style={{ fontFamily:"'Montserrat', sans-serif", fontSize:"0.6rem", fontWeight:800, color:C.accent, letterSpacing:"0.18em", textTransform:"uppercase" }}>Padre</p>
+        </div>
+        <Row label="Nombre" value={`${data.nombrePadre} ${data.apellidosPadre}`} />
+        <Row label="Correo" value={data.correoPadre} />
+        <Row label="Celular" value={data.celularPadre} />
+      </div>
+
+      {/* Mamá */}
+      <div style={{ background:C.white, border:`1px solid ${C.line}`, borderRadius:"16px", overflow:"hidden", marginBottom:"1rem" }}>
+        <div style={{ background:C.panel, padding:"0.65rem 1.2rem" }}>
+          <p style={{ fontFamily:"'Montserrat', sans-serif", fontSize:"0.6rem", fontWeight:800, color:C.accent, letterSpacing:"0.18em", textTransform:"uppercase" }}>Madre</p>
+        </div>
+        <Row label="Nombre" value={`${data.nombreMadre} ${data.apellidosMadre}`} />
+        <Row label="Correo" value={data.correoMadre} />
+        <Row label="Celular" value={data.celularMadre} />
+      </div>
+
+      {/* Otro acudiente si existe */}
+      {data.nombreOtro && (
+        <div style={{ background:C.white, border:`1px solid ${C.line}`, borderRadius:"16px", overflow:"hidden", marginBottom:"1rem" }}>
+          <div style={{ background:C.panel, padding:"0.65rem 1.2rem" }}>
+            <p style={{ fontFamily:"'Montserrat', sans-serif", fontSize:"0.6rem", fontWeight:800, color:C.accent, letterSpacing:"0.18em", textTransform:"uppercase" }}>Otro acudiente</p>
+          </div>
+          <Row label="Nombre" value={`${data.nombreOtro} ${data.apellidosOtro}`} />
+          <Row label="Correo" value={data.correoOtro} />
+          <Row label="Celular" value={data.celularOtro} />
+        </div>
+      )}
+
+      {/* Admisión */}
+      <div style={{ background:C.white, border:`1px solid ${C.line}`, borderRadius:"16px", overflow:"hidden", marginBottom:"1rem" }}>
+        <div style={{ background:C.night, padding:"0.65rem 1.2rem" }}>
+          <p style={{ fontFamily:"'Montserrat', sans-serif", fontSize:"0.6rem", fontWeight:800, color:"rgba(255,255,255,0.7)", letterSpacing:"0.18em", textTransform:"uppercase" }}>Proceso de admisión</p>
+        </div>
+        <div style={{ padding:"0.75rem 1.2rem" }}>
+          <p style={{ fontFamily:"'Poppins', sans-serif", fontSize:"0.85rem", color:C.accent }}>
+            {docsCount} documento(s) adjunto(s)
+          </p>
+        </div>
+      </div>
+
+      <p style={{ fontFamily:"'Poppins', sans-serif", fontSize:"0.78rem", color:C.muted, lineHeight:1.65 }}>
+        Al enviar este registro, el equipo de admisiones se comunicará contigo a través de los correos y celulares registrados.
+      </p>
+    </>
+  );
+}
+
 // ─── PROGRESS RESTORE MODAL ──────────────────────────────────────────────────
 function RestoreModal({ savedData, onRestore, onDismiss }) {
   return (
@@ -1583,10 +1375,7 @@ function RestoreModal({ savedData, onRestore, onDismiss }) {
 }
 
 // ─── FINAL ────────────────────────────────────────────────────────────────────
-function Final({ data, modo }) {
-  const includeOH = modo === "openhouse" || data.asistirOpenHouse === true;
-  const includeAdm = modo === "admision" || data.continuarAdmision === true;
-
+function Final({ data }) {
   return (
     <motion.div
       initial={{ opacity:0 }} animate={{ opacity:1 }}
@@ -1620,16 +1409,9 @@ function Final({ data, modo }) {
           </h1>
 
           <div style={{ display:"flex", flexDirection:"column", gap:"8px", marginBottom:"2rem" }}>
-            {includeOH && (
-              <div style={{ background:"#FFFBEB", border:"1px solid #FDE68A", borderRadius:"12px", padding:"0.75rem 1rem" }}>
-                <p style={{ fontFamily:"'Poppins', sans-serif", fontSize:"0.82rem", color:"#92400E" }}>✓ Lugar en Open House reservado · 11 de julio</p>
-              </div>
-            )}
-            {includeAdm && (
-              <div style={{ background:C.panel, border:`1px solid ${C.lineHov}`, borderRadius:"12px", padding:"0.75rem 1rem" }}>
-                <p style={{ fontFamily:"'Poppins', sans-serif", fontSize:"0.82rem", color:C.accent }}>✓ Proceso de admisión iniciado</p>
-              </div>
-            )}
+            <div style={{ background:C.panel, border:`1px solid ${C.lineHov}`, borderRadius:"12px", padding:"0.75rem 1rem" }}>
+              <p style={{ fontFamily:"'Poppins', sans-serif", fontSize:"0.82rem", color:C.accent }}>✓ Proceso de admisión iniciado</p>
+            </div>
           </div>
 
           <p style={{ fontFamily:"'Poppins', sans-serif", fontWeight:300, fontSize:"0.92rem", color:C.muted, lineHeight:1.75, marginBottom:"2.5rem" }}>
@@ -1659,24 +1441,40 @@ const slideVariants = {
 };
 
 const EMPTY_DATA = {
-  tipoRegistro:"", politicaAceptada:null,
-  correo:"",
-  nombreAspirante:"", apellidosAspirante:"", fechaNacimiento:"", edad:"",
-  grado:"", nivelDetectado:"",
-  estudiaActual:null, colegioProcedencia:"",
-  acudientesSeleccionados:[], correoOwner:"",
-  apellidosOtro:"", nombreOtro:"", correoOtro:"", celularOtro:"",
-  apellidosPadre:"", nombrePadre:"", correoPadre:"", celularPadre:"",
-  apellidosMadre:"", nombreMadre:"", correoMadre:"", celularMadre:"",
-  motivacion:"", canalEnterado:"",
-  numeroAsistentes:"", nombresAsistentes:"",
-  asistirOpenHouse:null,
-  continuarAdmision:null,
+  politicaAceptada: null,
+  correo: "",
+  correoOwner: "",
+  nombreAspirante: "", 
+  apellidosAspirante: "", 
+  fechaNacimiento: "", 
+  edad: "",
+  grado: "", 
+  nivelDetectado: "",
+  estudiaActual: null, 
+  colegioProcedencia: "",
+  acudientesSeleccionados: [],
+  apellidosOtro: "", 
+  nombreOtro: "", 
+  correoOtro: "", 
+  celularOtro: "",
+  apellidosPadre: "", 
+  nombrePadre: "", 
+  correoPadre: "", 
+  celularPadre: "",
+  apellidosMadre: "", 
+  nombreMadre: "", 
+  correoMadre: "", 
+  celularMadre: "",
+  motivacion: "", 
+  canalEnterado: "",
 };
 
 const EMPTY_FILES = {
-  comprobantePago:null, registroCivil:null,
-  informeAcademico:null, fichaSeguimiento:null, pazYSalvo:null,
+  comprobantePago:null, 
+  registroCivil:null,
+  informeAcademico:null, 
+  fichaSeguimiento:null, 
+  pazYSalvo:null,
 };
 
 export default function Registro() {
@@ -1688,26 +1486,12 @@ export default function Registro() {
   const [restoreCandidate, setRestoreCandidate] = useState(null);
   const [sending, setSending] = useState(false);
 
-  const modo = data.tipoRegistro;
-  const isAdmision = modo === "admision";
-  const isOH = modo === "openhouse";
-
   // Guardado local
   useEffect(() => {
     if (data.correo && stepIdx > 0) {
       try { localStorage.setItem(`registro_${data.correo}`, JSON.stringify({ data, stepIdx })); } catch(e) {}
     }
   }, [data, stepIdx]);
-
-    // Leer tipo desde URL (viene desde la landing)
-  useEffect(() => {
-    const params = new URLSearchParams(window.location.search);
-    const tipo = params.get("tipo");
-    if (tipo && ["openhouse", "admision", "ambos"].includes(tipo)) {
-      setData(prev => ({ ...prev, tipoRegistro: tipo }));
-      setStepIdx(1); // salta directamente a política
-    }
-  }, []);
 
   const handleProgressRestore = (saved) => {
     setRestoreCandidate(saved);
@@ -1719,10 +1503,9 @@ export default function Registro() {
     setRestoreCandidate(null);
   };
 
-  // Construcción dinámica de steps
+  // Construcción dinámica de steps - AHORA SOLO ADMISIÓN
   const buildSteps = useCallback(() => {
     const steps = [];
-    steps.push({ id:"tipo" });
     steps.push({ id:"politica" });
     steps.push({ id:"correo" });
     steps.push({ id:"aspirante" });
@@ -1736,29 +1519,12 @@ export default function Registro() {
 
     steps.push({ id:"acudientes" });
     steps.push({ id:"motivacion" });
-
-    if (isOH) {
-      steps.push({ id:"openhouse" });
-      steps.push({ id:"continuarAdmision" });
-      if (data.continuarAdmision === true) {
-        steps.push({ id:"pago" });
-        steps.push({ id:"documentos" });
-      }
-    }
-
-    if (isAdmision) {
-      steps.push({ id:"openHouseAdmision" });
-      if (data.asistirOpenHouse === true) {
-        // ya se preguntó arriba en el mismo step
-      }
-      steps.push({ id:"pago" });
-      steps.push({ id:"documentos" });
-    }
-
+    steps.push({ id:"pago" });
+    steps.push({ id:"documentos" });
     steps.push({ id:"resumen" });
     return steps;
-  }, [data.nivelDetectado, data.grado, isOH, isAdmision, data.continuarAdmision, data.asistirOpenHouse]);
-
+  }, [data.nivelDetectado, data.grado]);
+  
   const steps = buildSteps();
   const currentStep = steps[stepIdx];
   const totalSteps = steps.length;
@@ -1766,7 +1532,6 @@ export default function Registro() {
   const canNext = useCallback(() => {
     if (!currentStep) return false;
     const { id } = currentStep;
-    if (id === "tipo") return !!data.tipoRegistro;
     if (id === "politica") return data.politicaAceptada === true;
     if (id === "correo") return data.correo.includes("@");
     if (id === "aspirante") return data.nombreAspirante.trim() && data.apellidosAspirante.trim() && data.fechaNacimiento;
@@ -1774,22 +1539,19 @@ export default function Registro() {
     if (id === "estudia") return data.estudiaActual !== null && (data.estudiaActual === false || data.colegioProcedencia.trim());
     if (id === "colegio") return data.colegioProcedencia.trim();
     if (id === "acudientes") {
-  const sel = data.acudientesSeleccionados || [];
-  if (!sel.length) return false;
-  return sel.every(tipo => {
-    const campos = {
-      papa: { ap: "apellidosPadre", nm: "nombrePadre", co: "correoPadre", ce: "celularPadre" },
-      mama: { ap: "apellidosMadre", nm: "nombreMadre", co: "correoMadre", ce: "celularMadre" },
-      otro: { ap: "apellidosOtro", nm: "nombreOtro", co: "correoOtro", ce: "celularOtro" },
-    }[tipo];
-    const correoVal = data.correoOwner === tipo ? data.correo : data[campos.co];
-    return data[campos.ap]?.trim() && data[campos.nm]?.trim() && correoVal?.includes("@") && data[campos.ce]?.trim();
-  });
-}
+      const sel = data.acudientesSeleccionados || [];
+      if (!sel.length) return false;
+      return sel.every(tipo => {
+        const campos = {
+          papa: { ap: "apellidosPadre", nm: "nombrePadre", co: "correoPadre", ce: "celularPadre" },
+          mama: { ap: "apellidosMadre", nm: "nombreMadre", co: "correoMadre", ce: "celularMadre" },
+          otro: { ap: "apellidosOtro", nm: "nombreOtro", co: "correoOtro", ce: "celularOtro" },
+        }[tipo];
+        const correoVal = data.correoOwner === tipo ? data.correo : data[campos.co];
+        return data[campos.ap]?.trim() && data[campos.nm]?.trim() && correoVal?.includes("@") && data[campos.ce]?.trim();
+      });
+    }
     if (id === "motivacion") return data.motivacion.trim() && data.canalEnterado;
-    if (id === "openhouse") return data.numeroAsistentes && data.nombresAsistentes.trim();
-    if (id === "continuarAdmision") return data.continuarAdmision !== null;
-    if (id === "openHouseAdmision") return data.asistirOpenHouse !== null;
     if (id === "pago") return !!files.comprobantePago_link;
     if (id === "documentos") return (
       !!files.registroCivil_link &&
@@ -1818,78 +1580,69 @@ export default function Registro() {
     }
   };
 
+  // handleSubmit simplificado - SIEMPRE admisión
+  const handleSubmit = async () => {
+    setSending(true);
 
-// Reemplaza la función handleSubmit existente
-const handleSubmit = async () => {
-  setSending(true);
+    try {
+      const datosAEnviar = {
+        tipoRegistro: "admision",
+        correo: data.correo,
+        correoOwner: data.correoOwner,
+        nombreAspirante: data.nombreAspirante,
+        apellidosAspirante: data.apellidosAspirante,
+        fechaNacimiento: data.fechaNacimiento,
+        edad: data.edad,
+        grado: data.grado,
+        estudiaActual: data.estudiaActual,
+        colegioProcedencia: data.colegioProcedencia,
+        nombrePadre: data.nombrePadre,
+        apellidosPadre: data.apellidosPadre,
+        correoPadre: data.correoPadre,
+        celularPadre: data.celularPadre,
+        nombreMadre: data.nombreMadre,
+        apellidosMadre: data.apellidosMadre,
+        correoMadre: data.correoMadre,
+        celularMadre: data.celularMadre,
+        nombreOtro: data.nombreOtro,
+        apellidosOtro: data.apellidosOtro,
+        correoOtro: data.correoOtro,
+        celularOtro: data.celularOtro,
+        motivacion: data.motivacion,
+        canalEnterado: data.canalEnterado,
+        comprobantePago_link: files.comprobantePago_link || null,
+        registroCivil_link: files.registroCivil_link || null,
+        informeAcademico_link: files.informeAcademico_link || null,
+        fichaSeguimiento_link: files.fichaSeguimiento_link || null,
+        pazYSalvo_link: files.pazYSalvo_link || null,
+      };
 
-  try {
-    let tipoRegistroFinal = data.tipoRegistro;
-    if (data.tipoRegistro === "openhouse" && data.continuarAdmision === true) tipoRegistroFinal = "openhouse_admision";
-    if (data.tipoRegistro === "admision" && data.asistirOpenHouse === true) tipoRegistroFinal = "admision_openhouse";
+      const resultado = await guardarRegistro(datosAEnviar);
 
-    const datosAEnviar = {
-      tipoRegistro: tipoRegistroFinal,
-      correo: data.correo,
-      correoOwner: data.correoOwner,
-      nombreAspirante: data.nombreAspirante,
-      apellidosAspirante: data.apellidosAspirante,
-      fechaNacimiento: data.fechaNacimiento,
-      edad: data.edad,
-      grado: data.grado,
-      estudiaActual: data.estudiaActual,
-      colegioProcedencia: data.colegioProcedencia,
-      nombrePadre: data.nombrePadre,
-      apellidosPadre: data.apellidosPadre,
-      correoPadre: data.correoPadre,
-      celularPadre: data.celularPadre,
-      nombreMadre: data.nombreMadre,
-      apellidosMadre: data.apellidosMadre,
-      correoMadre: data.correoMadre,
-      celularMadre: data.celularMadre,
-      nombreOtro: data.nombreOtro,
-      apellidosOtro: data.apellidosOtro,
-      correoOtro: data.correoOtro,
-      celularOtro: data.celularOtro,
-      motivacion: data.motivacion,
-      canalEnterado: data.canalEnterado,
-      asistirOpenHouse: data.asistirOpenHouse,
-      numeroAsistentes: data.numeroAsistentes,
-      nombresAsistentes: data.nombresAsistentes,
-      continuarAdmision: data.continuarAdmision,
-      comprobantePago_link: files.comprobantePago_link || null,
-      registroCivil_link: files.registroCivil_link || null,
-      informeAcademico_link: files.informeAcademico_link || null,
-      fichaSeguimiento_link: files.fichaSeguimiento_link || null,
-      pazYSalvo_link: files.pazYSalvo_link || null,
-    };
-
-    const resultado = await guardarRegistro(datosAEnviar);
-
-    if (resultado.success) {
-      try { localStorage.removeItem(`registro_${data.correo}`); } catch(e) {}
-      setPhase("done");
-    } else {
-      if (resultado.error?.includes("Ya existe")) {
-        setPhase("duplicado");
+      if (resultado.success) {
+        try { localStorage.removeItem(`registro_${data.correo}`); } catch(e) {}
+        setPhase("done");
       } else {
-        setPhase("error");
+        if (resultado.error?.includes("Ya existe")) {
+          setPhase("duplicado");
+        } else {
+          setPhase("error");
+        }
       }
-    }
 
-  } catch (error) {
-    console.error("Error al enviar:", error);
-    setPhase("error");
-  } finally {
-    setSending(false);
-  }
-};
+    } catch (error) {
+      console.error("Error al enviar:", error);
+      setPhase("error");
+    } finally {
+      setSending(false);
+    }
+  };
 
   const renderStep = () => {
     if (!currentStep) return null;
     const { id } = currentStep;
     const props = { data, setData, files, setFiles };
-    if (id === "tipo") return <StepTipo {...props} />;
+    
     if (id === "politica") return <StepPolitica {...props} />;
     if (id === "correo") return <StepCorreo {...props} onProgressRestore={handleProgressRestore} />;
     if (id === "aspirante") return <StepAspirante {...props} />;
@@ -1898,79 +1651,76 @@ const handleSubmit = async () => {
     if (id === "colegio") return <StepColegio {...props} />;
     if (id === "acudientes") return <StepAcudientes {...props} />;
     if (id === "motivacion") return <StepMotivacion {...props} />;
-    if (id === "openhouse") return <StepOpenHouse {...props} />;
-    if (id === "continuarAdmision") return <StepContinuarAdmision {...props} />;
-    if (id === "openHouseAdmision") return <StepOpenHouseAdmision {...props} />;
     if (id === "pago") return <StepPago {...props} />;
     if (id === "documentos") return <StepDocumentos {...props} />;
-    if (id === "resumen") return <StepResumen data={data} files={files} modo={modo} />;
+    if (id === "resumen") return <StepResumen data={data} files={files} />;
     return null;
   };
 
   if (sending) return (
-  <AnimatePresence>
-    <SendingScreen />
-  </AnimatePresence>
-);
+    <AnimatePresence>
+      <SendingScreen />
+    </AnimatePresence>
+  );
 
   if (phase === "duplicado") return (
-  <>
-    <style>{FONTS}</style>
-    <Topbar stepIdx={0} totalSteps={0} tipoRegistro={null} />
-    <div style={{ minHeight:"100vh", background:C.bg, display:"flex", alignItems:"center", justifyContent:"center", padding:"2rem" }}>
-      <div style={{ maxWidth:"480px", width:"100%", textAlign:"center" }}>
-        <div style={{ fontSize:"3rem", marginBottom:"1.5rem" }}>📋</div>
-        <h2 style={{ fontFamily:"'Montserrat', sans-serif", fontWeight:800, fontSize:"1.6rem", color:C.dark, marginBottom:"1rem" }}>
-          Ya tienes un registro
-        </h2>
-        <p style={{ fontFamily:"'Poppins', sans-serif", fontSize:"0.9rem", color:C.muted, lineHeight:1.7, marginBottom:"1.5rem" }}>
-          Ya existe un registro con el correo <strong style={{ color:C.dark }}>{data.correo}</strong>. Si crees que es un error, escríbenos.
-        </p>
-        <a href="https://admisiones.sipresc.co" style={{ all:"unset", cursor:"pointer", background:C.dark, color:C.white, fontFamily:"'Montserrat', sans-serif", fontWeight:700, fontSize:"0.82rem", padding:"0.9rem 2rem", borderRadius:"999px", display:"inline-block" }}>
-          Volver a admisiones
-        </a>
-      </div>
-    </div>
-  </>
-);
-
-if (phase === "error") return (
-  <>
-    <style>{FONTS}</style>
-    <Topbar stepIdx={0} totalSteps={0} tipoRegistro={null} />
-    <div style={{ minHeight:"100vh", background:C.bg, display:"flex", alignItems:"center", justifyContent:"center", padding:"2rem" }}>
-      <div style={{ maxWidth:"480px", width:"100%", textAlign:"center" }}>
-        <div style={{ fontSize:"3rem", marginBottom:"1.5rem" }}>⚠️</div>
-        <h2 style={{ fontFamily:"'Montserrat', sans-serif", fontWeight:800, fontSize:"1.6rem", color:C.dark, marginBottom:"1rem" }}>
-          Hubo un problema al enviar
-        </h2>
-        <p style={{ fontFamily:"'Poppins', sans-serif", fontSize:"0.9rem", color:C.muted, lineHeight:1.7, marginBottom:"0.5rem" }}>
-          Tu información está guardada en este dispositivo. Intenta de nuevo o escríbenos directamente:
-        </p>
-        <p style={{ fontFamily:"'Montserrat', sans-serif", fontWeight:700, fontSize:"0.9rem", color:C.accent, marginBottom:"1.5rem" }}>
-          admisiones@lapresentaciongirardota.edu.co
-        </p>
-        <div style={{ display:"flex", gap:"10px", justifyContent:"center", flexWrap:"wrap" }}>
-          <button
-            onClick={() => { setPhase("form"); setSending(false); }}
-            style={{ all:"unset", cursor:"pointer", background:C.dark, color:C.white, fontFamily:"'Montserrat', sans-serif", fontWeight:700, fontSize:"0.82rem", padding:"0.9rem 2rem", borderRadius:"999px" }}
-          >
-            Intentar de nuevo
-          </button>
-          <a href="https://admisiones.sipresc.co" style={{ all:"unset", cursor:"pointer", background:C.bg, color:C.body, fontFamily:"'Montserrat', sans-serif", fontWeight:600, fontSize:"0.82rem", padding:"0.9rem 2rem", borderRadius:"999px", border:`1px solid ${C.line}` }}>
-            Volver
+    <>
+      <style>{FONTS}</style>
+      <Topbar stepIdx={0} totalSteps={0} />
+      <div style={{ minHeight:"100vh", background:C.bg, display:"flex", alignItems:"center", justifyContent:"center", padding:"2rem" }}>
+        <div style={{ maxWidth:"480px", width:"100%", textAlign:"center" }}>
+          <div style={{ fontSize:"3rem", marginBottom:"1.5rem" }}>📋</div>
+          <h2 style={{ fontFamily:"'Montserrat', sans-serif", fontWeight:800, fontSize:"1.6rem", color:C.dark, marginBottom:"1rem" }}>
+            Ya tienes un registro
+          </h2>
+          <p style={{ fontFamily:"'Poppins', sans-serif", fontSize:"0.9rem", color:C.muted, lineHeight:1.7, marginBottom:"1.5rem" }}>
+            Ya existe un registro con el correo <strong style={{ color:C.dark }}>{data.correo}</strong>. Si crees que es un error, escríbenos.
+          </p>
+          <a href="https://admisiones.sipresc.co" style={{ all:"unset", cursor:"pointer", background:C.dark, color:C.white, fontFamily:"'Montserrat', sans-serif", fontWeight:700, fontSize:"0.82rem", padding:"0.9rem 2rem", borderRadius:"999px", display:"inline-block" }}>
+            Volver a admisiones
           </a>
         </div>
       </div>
-    </div>
-  </>
-);
+    </>
+  );
+
+  if (phase === "error") return (
+    <>
+      <style>{FONTS}</style>
+      <Topbar stepIdx={0} totalSteps={0} />
+      <div style={{ minHeight:"100vh", background:C.bg, display:"flex", alignItems:"center", justifyContent:"center", padding:"2rem" }}>
+        <div style={{ maxWidth:"480px", width:"100%", textAlign:"center" }}>
+          <div style={{ fontSize:"3rem", marginBottom:"1.5rem" }}>⚠️</div>
+          <h2 style={{ fontFamily:"'Montserrat', sans-serif", fontWeight:800, fontSize:"1.6rem", color:C.dark, marginBottom:"1rem" }}>
+            Hubo un problema al enviar
+          </h2>
+          <p style={{ fontFamily:"'Poppins', sans-serif", fontSize:"0.9rem", color:C.muted, lineHeight:1.7, marginBottom:"0.5rem" }}>
+            Tu información está guardada en este dispositivo. Intenta de nuevo o escríbenos directamente:
+          </p>
+          <p style={{ fontFamily:"'Montserrat', sans-serif", fontWeight:700, fontSize:"0.9rem", color:C.accent, marginBottom:"1.5rem" }}>
+            admisiones@lapresentaciongirardota.edu.co
+          </p>
+          <div style={{ display:"flex", gap:"10px", justifyContent:"center", flexWrap:"wrap" }}>
+            <button
+              onClick={() => { setPhase("form"); setSending(false); }}
+              style={{ all:"unset", cursor:"pointer", background:C.dark, color:C.white, fontFamily:"'Montserrat', sans-serif", fontWeight:700, fontSize:"0.82rem", padding:"0.9rem 2rem", borderRadius:"999px" }}
+            >
+              Intentar de nuevo
+            </button>
+            <a href="https://admisiones.sipresc.co" style={{ all:"unset", cursor:"pointer", background:C.bg, color:C.body, fontFamily:"'Montserrat', sans-serif", fontWeight:600, fontSize:"0.82rem", padding:"0.9rem 2rem", borderRadius:"999px", border:`1px solid ${C.line}` }}>
+              Volver
+            </a>
+          </div>
+        </div>
+      </div>
+    </>
+  );
 
   if (phase === "done") return (
     <>
       <style>{FONTS}</style>
-      <Topbar stepIdx={0} totalSteps={0} tipoRegistro={null} />
-      <Final data={data} modo={modo} />
+      <Topbar stepIdx={0} totalSteps={0} />
+      <Final data={data} />
     </>
   );
 
@@ -1981,7 +1731,7 @@ if (phase === "error") return (
     <div style={{ minHeight:"100vh", background:C.bg, position:"relative" }}>
       <style>{FONTS}</style>
       <AbstractBackground nivel={data.nivelDetectado} />
-      <Topbar stepIdx={stepIdx} totalSteps={totalSteps} tipoRegistro={data.tipoRegistro} />
+      <Topbar stepIdx={stepIdx} totalSteps={totalSteps} />
 
       {/* Restore modal */}
       <AnimatePresence>
