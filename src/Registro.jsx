@@ -754,6 +754,58 @@ function SendingScreen() {
     </motion.div>
   );
 }
+
+// ─── STEP INFO ─────────────────────────────────────────────────────────────────
+function StepInfo({ data, setData }) {
+  return (
+    <>
+      <StepTitle
+        badge="Admisiones 2027"
+        title="Proceso de admisión"
+        sub="Completa el registro para iniciar el proceso de admisión en La Presentación."
+      />
+      
+      {/* Información del pago */}
+      <div style={{ background: C.night, borderRadius:"16px", padding:"1.4rem 1.6rem", marginBottom:"1.5rem" }}>
+        <p style={{ fontFamily:"'Montserrat', sans-serif", fontSize:"0.58rem", fontWeight:700, color:"rgba(255,255,255,0.4)", letterSpacing:"0.2em", textTransform:"uppercase", marginBottom:"0.4rem" }}>
+          Derecho de admisión
+        </p>
+        <p style={{ fontFamily:"'Montserrat', sans-serif", fontWeight:900, fontSize:"2.4rem", color:C.white, lineHeight:1, marginBottom:"0.75rem" }}>
+          $40.000
+        </p>
+        <p style={{ fontFamily:"'Poppins', sans-serif", fontSize:"0.78rem", color:"rgba(255,255,255,0.45)", lineHeight:1.6 }}>
+          Cuenta de ahorros Bancolombia No. 39900005178 a nombre de <br/>
+          <strong style={{ color:C.white }}>Instituto Parroquial Nuestra Señora de la Presentación</strong>
+        </p>
+      </div>
+
+      {/* Documentos requeridos */}
+      <div style={{ background: C.bg, borderRadius:"14px", padding:"1.2rem 1.4rem", marginBottom:"1.5rem" }}>
+        <p style={{ fontFamily:"'Montserrat', sans-serif", fontSize:"0.58rem", fontWeight:700, color:C.muted, letterSpacing:"0.18em", textTransform:"uppercase", marginBottom:"0.6rem" }}>
+          Documentos que debes tener listos
+        </p>
+        <div style={{ display:"flex", flexDirection:"column", gap:"6px" }}>
+          {[
+            "Comprobante de pago",
+            "Registro civil del aspirante",
+            "Último informe académico",
+            "Ficha de seguimiento u hoja de vida",
+            "Paz y salvo del colegio anterior"
+          ].map(d => (
+            <div key={d} style={{ display:"flex", alignItems:"center", gap:"8px" }}>
+              <div style={{ width:"4px", height:"4px", borderRadius:"50%", background:C.accent, flexShrink:0 }} />
+              <p style={{ fontFamily:"'Poppins', sans-serif", fontSize:"0.78rem", color:C.body }}>{d}</p>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      <p style={{ fontFamily:"'Poppins', sans-serif", fontSize:"0.82rem", color:C.muted, lineHeight:1.6 }}>
+        Ten estos documentos a la mano antes de comenzar. Los subirás durante el proceso.
+      </p>
+    </>
+  );
+}
 // ─── STEP TITLE ───────────────────────────────────────────────────────────────
 function StepTitle({ badge, title, sub }) {
   return (
@@ -1506,6 +1558,7 @@ export default function Registro() {
   // Construcción dinámica de steps - AHORA SOLO ADMISIÓN
   const buildSteps = useCallback(() => {
     const steps = [];
+    steps.push({ id:"info" });
     steps.push({ id:"politica" });
     steps.push({ id:"correo" });
     steps.push({ id:"aspirante" });
@@ -1532,6 +1585,7 @@ export default function Registro() {
   const canNext = useCallback(() => {
     if (!currentStep) return false;
     const { id } = currentStep;
+    if (id === "info") return true;
     if (id === "politica") return data.politicaAceptada === true;
     if (id === "correo") return data.correo.includes("@");
     if (id === "aspirante") return data.nombreAspirante.trim() && data.apellidosAspirante.trim() && data.fechaNacimiento;
@@ -1642,7 +1696,8 @@ export default function Registro() {
     if (!currentStep) return null;
     const { id } = currentStep;
     const props = { data, setData, files, setFiles };
-    
+
+    if (id === "info") return <StepInfo {...props} />;
     if (id === "politica") return <StepPolitica {...props} />;
     if (id === "correo") return <StepCorreo {...props} onProgressRestore={handleProgressRestore} />;
     if (id === "aspirante") return <StepAspirante {...props} />;
