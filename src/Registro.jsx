@@ -1979,16 +1979,18 @@ export default function Registro() {
       <AbstractBackground nivel={data.nivelDetectado} />
       <Topbar stepIdx={stepIdx} totalSteps={totalSteps} tipoRegistro={data.tipoRegistro} />
 
-      {/* Restore modal */}
-      <AnimatePresence>
-        {restoreCandidate && (
-          <RestoreModal
-            savedData={restoreCandidate}
-            onRestore={handleRestore}
-            onDismiss={() => setRestoreCandidate(null)}
-          />
-        )}
-      </AnimatePresence>
+      {/* Restore modal - DESACTIVADO para evitar conflicto con selección de hijos */}
+{/* 
+<AnimatePresence>
+  {restoreCandidate && (
+    <RestoreModal
+      savedData={restoreCandidate}
+      onRestore={handleRestore}
+      onDismiss={() => setRestoreCandidate(null)}
+    />
+  )}
+</AnimatePresence>
+*/}
 
       {/* Modal de selección de hijos */}
       <AnimatePresence>
