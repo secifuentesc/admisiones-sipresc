@@ -1068,6 +1068,7 @@ function TimelineSection() {
 
 // ─── REGISTRO ─────────────────────────────────────────────────────────────────
 // ✅ ACTUALIZADO: Solo admisión, eliminadas las dos opciones de Open House
+// ─── REGISTRO ─────────────────────────────────────────────────────────────────
 function RegistroSection() {
   return (
     <Section
@@ -1077,14 +1078,17 @@ function RegistroSection() {
         background: "linear-gradient(135deg, #21145F 0%, #0E0A35 100%)",
       }}
     >
-      <div className="max-w-5xl mx-auto">
-        <motion.p variants={fadeUp} className="text-yellow-400 text-xs font-bold tracking-[0.3em] uppercase mb-4 text-center">
+      <div className="max-w-4xl mx-auto text-center">
+        <motion.p
+          variants={fadeUp}
+          className="text-yellow-400 text-xs font-bold tracking-[0.3em] uppercase mb-4"
+        >
           Comienza aquí
         </motion.p>
 
         <motion.h2
           variants={fadeUp}
-          className="font-black text-3xl md:text-5xl text-center mb-4 leading-tight"
+          className="font-black text-3xl md:text-5xl mb-4 leading-tight"
           style={{ fontFamily: "'Montserrat', sans-serif", color: "#FFFFFF" }}
         >
           Inicia el proceso de admisión
@@ -1092,67 +1096,62 @@ function RegistroSection() {
 
         <motion.p
           variants={fadeUp}
-          className="text-white/65 text-lg text-center mb-12 max-w-2xl mx-auto"
+          className="text-white/65 text-lg leading-relaxed mb-12 max-w-2xl mx-auto"
           style={{ fontFamily: "'Poppins', sans-serif" }}
         >
           El proceso de admisión 2027 está abierto. Regístrate y nuestro equipo te acompañará en cada paso.
         </motion.p>
 
-        <div className="grid md:grid-cols-2 gap-6 max-w-3xl mx-auto">
-          <motion.div
-            variants={fadeUp}
-            whileHover={{ y: -4, transition: { duration: 0.3 } }}
-            className="md:col-span-2 p-8 rounded-3xl border-2 flex flex-col justify-between gap-6"
+        <motion.div
+          variants={fadeUp}
+          whileHover={{ y: -4, transition: { duration: 0.3 } }}
+          className="max-w-2xl mx-auto p-8 md:p-10 rounded-3xl border-2"
+          style={{
+            background: "#FFFFFF",
+            borderColor: "#FFFFFF",
+          }}
+        >
+          <div
+            className="inline-block px-3 py-1 rounded-full text-xs font-bold tracking-wide mb-4"
             style={{
-              background: "#FFFFFF",
-              borderColor: "#FFFFFF",
+              background: "#F7F8FC",
+              color: "#21145F",
+              border: "1px solid #E8EAF0",
             }}
           >
-            <div>
-              <div
-                className="inline-block px-3 py-1 rounded-full text-xs font-bold tracking-wide mb-4"
-                style={{
-                  background: "#F7F8FC",
-                  color: "#21145F",
-                  border: "1px solid #E8EAF0",
-                }}
-              >
-                Proceso activo
-              </div>
+            Proceso activo
+          </div>
 
-              <h3
-                className="font-black text-xl mb-3"
-                style={{
-                  color: "#21145F",
-                  fontFamily: "'Montserrat', sans-serif",
-                }}
-              >
-                Iniciar proceso de admisión
-              </h3>
+          <h3
+            className="font-black text-xl md:text-2xl mb-3"
+            style={{
+              color: "#21145F",
+              fontFamily: "'Montserrat', sans-serif",
+            }}
+          >
+            Iniciar proceso de admisión
+          </h3>
 
-              <p
-                className="text-sm leading-relaxed"
-                style={{
-                  color: "#6B7280",
-                  fontFamily: "'Poppins', sans-serif",
-                }}
-              >
-                Completa el registro con los datos del aspirante y los acudientes. El equipo de admisiones se comunicará contigo para orientarte en los siguientes pasos.
-              </p>
+          <p
+            className="text-sm md:text-base leading-relaxed max-w-xl mx-auto"
+            style={{
+              color: "#6B7280",
+              fontFamily: "'Poppins', sans-serif",
+            }}
+          >
+            Completa el registro con los datos del aspirante y los acudientes. El equipo de admisiones se comunicará contigo para orientarte en los siguientes pasos.
+          </p>
 
-              <div className="mt-4 flex flex-wrap gap-2">
-                <span className="text-xs px-3 py-1 rounded-full bg-[#EEF2FF] text-[#1A428A] font-medium">
-                  Sin costo de inscripción
-                </span>
-                <span className="text-xs px-3 py-1 rounded-full bg-[#F0FDF4] text-[#059669] font-medium">
-                  Acompañamiento personalizado
-                </span>
-              </div>
-            </div>
+          <div className="mt-6 flex flex-wrap justify-center gap-3">
+            <span className="text-xs px-4 py-1.5 rounded-full bg-[#EEF2FF] text-[#1A428A] font-medium">
+              Acompañamiento personalizado
+            </span>
+          </div>
 
+          <div className="mt-8">
             <a
               href={FORM_URL}
-              className="inline-block px-6 py-3 rounded-full font-bold text-sm text-center transition-all hover:opacity-90 w-full md:w-auto"
+              className="inline-block px-10 py-4 rounded-full font-bold text-sm tracking-wide transition-all hover:scale-[1.02] hover:opacity-90"
               style={{
                 background: "#21145F",
                 color: "#FFFFFF",
@@ -1161,64 +1160,8 @@ function RegistroSection() {
             >
               Iniciar registro
             </a>
-          </motion.div>
-
-          <motion.div
-            variants={fadeUp}
-            whileHover={{ y: -4, transition: { duration: 0.3 } }}
-            className="md:col-span-2 p-8 rounded-3xl border-2 flex flex-col justify-between gap-6"
-            style={{
-              background: "rgba(255,255,255,0.08)",
-              borderColor: "rgba(255,255,255,0.16)",
-            }}
-          >
-            <div>
-              <div
-                className="inline-block px-3 py-1 rounded-full text-xs font-bold tracking-wide mb-4"
-                style={{
-                  background: "rgba(255,255,255,0.12)",
-                  color: "#FFFFFF",
-                  border: "1px solid rgba(255,255,255,0.18)",
-                }}
-              >
-                Seguimiento
-              </div>
-
-              <h3
-                className="font-black text-xl mb-3"
-                style={{
-                  color: "#FFFFFF",
-                  fontFamily: "'Montserrat', sans-serif",
-                }}
-              >
-                ¿Ya iniciaste tu proceso?
-              </h3>
-
-              <p
-                className="text-sm leading-relaxed"
-                style={{
-                  color: "rgba(255,255,255,0.65)",
-                  fontFamily: "'Poppins', sans-serif",
-                }}
-              >
-                Consulta el estado de admisión de tu hijo con el correo o celular registrado por la familia.
-              </p>
-            </div>
-
-            <a
-              href="#consulta-proceso"
-              className="inline-block px-6 py-3 rounded-full font-bold text-sm text-center transition-all hover:opacity-90 w-full md:w-auto"
-              style={{
-                background: "rgba(255,255,255,0.15)",
-                color: "#FFFFFF",
-                fontFamily: "'Montserrat', sans-serif",
-                border: "1px solid rgba(255,255,255,0.2)",
-              }}
-            >
-              Consultar mi proceso
-            </a>
-          </motion.div>
-        </div>
+          </div>
+        </motion.div>
       </div>
     </Section>
   );
