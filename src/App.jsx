@@ -2,14 +2,13 @@ import { useEffect, useRef, useState } from "react";
 import { motion, useInView, AnimatePresence } from "framer-motion";
 
 import { BrowserRouter, Routes, Route } from "react-router-dom";
-import AdmisionesRegistro from "./AdmisionesRegistro"; // landing con los 3 botones
-import Registro from "./Registro"; // nuevo formulario con los 4 cambios
+import AdmisionesRegistro from "./AdmisionesRegistro";
+import Registro from "./Registro";
 
 import { consultarEstado } from "./api";
 
 // ─── CONFIG ──────────────────────────────────────────────────────────────────
 const FORM_URL = "/admisiones/registro";
-
 
 const DYNAMIC_PHRASES = [
   "crecer feliz.",
@@ -119,51 +118,37 @@ const STATUS_STEPS = [
 function getStepIndex(estado) {
   const value = String(estado || "").toLowerCase();
 
-  // Paso 0: Presentación del colegio / Registro inicial
   if (value.includes("presentación") || value.includes("open house") || value.includes("registro recibido")) return 0;
-  
-  // Paso 1: Inscripción
   if (value.includes("inscripción") || value.includes("registro completado")) return 1;
-  
-  // Paso 2: Prueba o pasantía
   if (value.includes("prueba") || value.includes("pasantía") || value.includes("prueba programada")) return 2;
-  
-  // Paso 3: Entrevista
   if (value.includes("entrevista") || value.includes("entrevista programada")) return 3;
-  
-  // Paso 4: Resultado
   if (value.includes("resultado") || value.includes("admitido") || value.includes("no admitido") || value.includes("lista de espera")) return 4;
-  
-  // Paso 5: Inducción / Finalizado
   if (value.includes("inducción") || value.includes("finalizado") || value.includes("bienvenida")) return 5;
 
   return 0;
 }
 
+// ✅ ACTUALIZADO: Timeline sin Open House
 const TIMELINE_STEPS = [
   { n: "01", title: "Registro inicial", text: "Déjanos tus datos para acompañarte desde el primer momento." },
-  { n: "02", title: "Open House", text: "Vive una experiencia cercana para conocer el colegio desde adentro." },
-  { n: "03", title: "Inscripción y documentos", text: "Continúa el proceso con la información requerida." },
-  { n: "04", title: "Pruebas y entrevista", text: "Queremos conocer al aspirante, su historia y su contexto familiar." },
-  { n: "05", title: "Resultado del proceso", text: "Recibirás la información por los canales institucionales." },
-  { n: "06", title: "Bienvenida", text: "Iniciamos juntos este nuevo camino en familia." },
+  { n: "02", title: "Inscripción y documentos", text: "Continúa el proceso con la información requerida." },
+  { n: "03", title: "Pruebas y entrevista", text: "Queremos conocer al aspirante, su historia y su contexto familiar." },
+  { n: "04", title: "Resultado del proceso", text: "Recibirás la información por los canales institucionales." },
+  { n: "05", title: "Bienvenida", text: "Iniciamos juntos este nuevo camino en familia." },
 ];
 
+// ✅ ACTUALIZADO: FAQ enfocado en admisión
 const FAQS = [
   {
-    q: "¿El Open House tiene costo?",
-    a: "No. Es una experiencia abierta para que las familias conozcan el colegio y puedan iniciar su proceso con mayor claridad.",
+    q: "¿El proceso de admisión tiene algún costo?",
+    a: "El registro inicial no tiene costo. El equipo de admisiones te orientará sobre los pasos siguientes y los costos asociados al proceso.",
   },
   {
-    q: "¿Puedo iniciar el proceso si no asisto al Open House?",
-    a: "Sí. En el registro podrás indicar que deseas recibir información y continuar el proceso de admisión.",
+    q: "¿Puedo iniciar el proceso si no asistí al Open House?",
+    a: "Sí. El proceso de admisión continúa abierto. Puedes iniciar tu registro en cualquier momento.",
   },
   {
-    q: "¿Cuántas personas pueden asistir al Open House?",
-    a: "Cada familia puede asistir hasta con 3 personas.",
-  },
-  {
-    q: "¿Qué grados están disponibles?",
+    q: "¿Qué grados están disponibles para 2027?",
     a: "El equipo de admisiones confirmará la disponibilidad según el grado al momento del registro.",
   },
   {
@@ -173,6 +158,10 @@ const FAQS = [
   {
     q: "¿Dónde puedo comunicarme si tengo dudas?",
     a: "Puedes dejar tus datos en el registro y el equipo institucional te acompañará por los canales oficiales.",
+  },
+  {
+    q: "¿Cuándo inician las clases en 2027?",
+    a: "El calendario académico se publicará oportunamente. El equipo de admisiones te informará sobre las fechas clave.",
   },
 ];
 
@@ -236,6 +225,7 @@ function Section({ children, className = "", style = {}, id }) {
 }
 
 // ─── HERO ─────────────────────────────────────────────────────────────────────
+// ✅ ACTUALIZADO: Botón Open House muestra "Realizado ✓"
 function Hero() {
   const [phraseIdx, setPhraseIdx] = useState(0);
   const [scrolled, setScrolled] = useState(false);
@@ -256,29 +246,26 @@ function Hero() {
 
   return (
     <section className="relative w-full h-screen min-h-[680px] overflow-hidden bg-[#0E0A35]">
-      {/* VIDEO / FONDO */}
       <div className="absolute inset-0 z-0">
         <video
-  className="absolute inset-0 w-full h-full object-cover"
-  autoPlay
-  muted
-  loop
-  playsInline
-  preload="auto"
->
-  <source 
-    src="https://res.cloudinary.com/dmfm1r8ar/video/upload/v1779986251/0528_1_lgkebw.mov" 
-    type="video/mp4" 
-  />
-</video>
+          className="absolute inset-0 w-full h-full object-cover"
+          autoPlay
+          muted
+          loop
+          playsInline
+          preload="auto"
+        >
+          <source 
+            src="https://res.cloudinary.com/dmfm1r8ar/video/upload/v1779986251/0528_1_lgkebw.mov" 
+            type="video/mp4" 
+          />
+        </video>
 
-        {/* Overlay cinematográfico más suave para que el video se vea */}
         <div className="absolute inset-0 bg-[#0E0A35]/28" />
         <div className="absolute inset-0 bg-gradient-to-b from-[#0E0A35]/55 via-[#0E0A35]/8 to-[#0E0A35]/88" />
         <div className="absolute inset-0 bg-gradient-to-r from-[#0E0A35]/68 via-transparent to-[#0E0A35]/48" />
       </div>
 
-      {/* HEADER SUPERIOR */}
       <motion.header
         initial={{ y: -24, opacity: 0 }}
         animate={{ y: 0, opacity: 1 }}
@@ -286,13 +273,12 @@ function Hero() {
         className="fixed top-0 left-0 right-0 z-50 px-5 md:px-12 py-6"
       >
         <div
-  className={`relative mx-auto max-w-7xl flex items-center justify-between gap-2 transition-all duration-500 ${
-    scrolled
-      ? "rounded-full bg-white/90 backdrop-blur-xl px-5 py-2 shadow-[0_18px_60px_rgba(0,0,0,0.12)]"
-      : "py-0"
-  }`}
->
-          {/* Izquierda superior */}
+          className={`relative mx-auto max-w-7xl flex items-center justify-between gap-2 transition-all duration-500 ${
+            scrolled
+              ? "rounded-full bg-white/90 backdrop-blur-xl px-5 py-2 shadow-[0_18px_60px_rgba(0,0,0,0.12)]"
+              : "py-0"
+          }`}
+        >
           <a
             href={FORM_URL}
             className={`hidden sm:inline-flex items-center gap-2 text-xs font-extrabold tracking-wide transition-colors duration-500 ${
@@ -311,7 +297,6 @@ function Hero() {
             />
           </a>
 
-          {/* Centro: marca */}
           <a
             href="#"
             className="absolute left-1/2 -translate-x-1/2 flex items-center gap-3 md:gap-4"
@@ -357,32 +342,28 @@ function Hero() {
             </div>
           </a>
 
-          {/* Derecha superior */}
-
-          <a
-  href="#openhouse"
-  className={`inline-flex items-center gap-1 md:gap-2 rounded-full px-3 md:px-4 py-1 md:py-2 text-[10px] md:text-xs font-bold tracking-wide transition-all duration-500 ${
-    scrolled
-      ? "bg-[#F7F8FC] text-[#21145F]"
-      : "bg-white/[0.14] text-white border border-white/35 backdrop-blur-md"
-  }`}
-  style={{
-    fontFamily: "'Montserrat', sans-serif",
-    textShadow: scrolled ? "none" : "0 8px 24px rgba(0,0,0,0.35)",
-  }}
->
-  <span className="hidden sm:inline">Open House</span>
-  <span className="sm:hidden">OH</span>
-  <span className={scrolled ? "text-[#1A428A]/60" : "text-white/45"}>·</span>
-  <span>11 jul</span>
-</a>
+          {/* ✅ ACTUALIZADO: Open House -> Realizado ✓ */}
+          <div
+            className={`inline-flex items-center gap-1 md:gap-2 rounded-full px-3 md:px-4 py-1 md:py-2 text-[10px] md:text-xs font-bold tracking-wide transition-all duration-500 ${
+              scrolled
+                ? "bg-[#F7F8FC] text-[#21145F]"
+                : "bg-white/[0.14] text-white/70 border border-white/20 backdrop-blur-md"
+            }`}
+            style={{
+              fontFamily: "'Montserrat', sans-serif",
+              textShadow: scrolled ? "none" : "0 8px 24px rgba(0,0,0,0.35)",
+            }}
+          >
+            <span className="hidden sm:inline">Open House</span>
+            <span className="sm:hidden">OH</span>
+            <span className={scrolled ? "text-[#1A428A]/40" : "text-white/30"}>·</span>
+            <span style={{ color: scrolled ? "#10B981" : "#6EE7B7" }}>Realizado ✓</span>
+          </div>
         </div>
       </motion.header>
 
-      {/* CONTENIDO INFERIOR */}
       <div className="relative z-10 h-full flex items-end px-6 md:px-12 pb-16 md:pb-24">
         <div className="w-full max-w-7xl mx-auto grid md:grid-cols-[1fr_0.42fr] gap-8 md:gap-16 items-end">
-          {/* Frase inferior izquierda */}
           <motion.div
             initial={{ opacity: 0, y: 42 }}
             animate={{ opacity: 1, y: 0 }}
@@ -416,7 +397,7 @@ function Hero() {
             </h1>
           </motion.div>
 
-          {/* Botones inferiores derecha */}
+          {/* ✅ ACTUALIZADO: Botones - eliminado "Conocer Open House" */}
           <motion.div
             initial={{ opacity: 0, y: 42 }}
             animate={{ opacity: 1, y: 0 }}
@@ -424,53 +405,38 @@ function Hero() {
             className="flex md:justify-end"
           >
             <div className="w-full md:w-[320px] space-y-3">
-  <a
-    href={FORM_URL}
-    className="group flex items-center justify-between w-full rounded-full px-7 py-4 bg-white text-[#21145F] backdrop-blur-xl font-semibold text-sm tracking-wide transition-all duration-300 hover:scale-[1.02] hover:bg-white"
-    style={{
-      fontFamily: "'Poppins', sans-serif",
-      boxShadow: "0 22px 70px rgba(0,0,0,0.34)",
-    }}
-  >
-    <span>Iniciar registro</span>
-    <span className="text-lg leading-none transition-transform duration-300 group-hover:translate-x-1">
-      →
-    </span>
-  </a>
+              <a
+                href={FORM_URL}
+                className="group flex items-center justify-between w-full rounded-full px-7 py-4 bg-white text-[#21145F] backdrop-blur-xl font-semibold text-sm tracking-wide transition-all duration-300 hover:scale-[1.02] hover:bg-white"
+                style={{
+                  fontFamily: "'Poppins', sans-serif",
+                  boxShadow: "0 22px 70px rgba(0,0,0,0.34)",
+                }}
+              >
+                <span>Iniciar proceso de admisión</span>
+                <span className="text-lg leading-none transition-transform duration-300 group-hover:translate-x-1">
+                  →
+                </span>
+              </a>
 
-  <a
-    href="#openhouse"
-    className="group flex items-center justify-between w-full rounded-full px-7 py-4 bg-white/[0.10] text-white border border-white/35 backdrop-blur-xl font-medium text-sm tracking-wide transition-all duration-300 hover:bg-white/18 hover:scale-[1.02]"
-    style={{
-      fontFamily: "'Poppins', sans-serif",
-      boxShadow: "0 18px 60px rgba(0,0,0,0.22)",
-    }}
-  >
-    <span>Conocer Open House</span>
-    <span className="text-lg leading-none transition-transform duration-300 group-hover:translate-y-0.5">
-      ↓
-    </span>
-  </a>
-
-  <a
-    href="#consulta-proceso"
-    className="group flex items-center justify-between w-full rounded-full px-7 py-4 bg-black/20 text-white border border-white/20 backdrop-blur-xl font-medium text-sm tracking-wide transition-all duration-300 hover:bg-white/12 hover:scale-[1.02]"
-    style={{
-      fontFamily: "'Poppins', sans-serif",
-      boxShadow: "0 18px 60px rgba(0,0,0,0.18)",
-    }}
-  >
-    <span>Consultar mi proceso</span>
-    <span className="text-lg leading-none transition-transform duration-300 group-hover:translate-y-0.5">
-      ↓
-    </span>
-  </a>
-</div>
+              <a
+                href="#consulta-proceso"
+                className="group flex items-center justify-between w-full rounded-full px-7 py-4 bg-black/20 text-white border border-white/20 backdrop-blur-xl font-medium text-sm tracking-wide transition-all duration-300 hover:bg-white/12 hover:scale-[1.02]"
+                style={{
+                  fontFamily: "'Poppins', sans-serif",
+                  boxShadow: "0 18px 60px rgba(0,0,0,0.18)",
+                }}
+              >
+                <span>Consultar mi proceso</span>
+                <span className="text-lg leading-none transition-transform duration-300 group-hover:translate-y-0.5">
+                  ↓
+                </span>
+              </a>
+            </div>
           </motion.div>
         </div>
       </div>
 
-      {/* Scroll */}
       <motion.div
         animate={{ y: [0, 8, 0] }}
         transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
@@ -528,29 +494,28 @@ function EmotionalSection() {
           </motion.div>
         </div>
 
-        {/* Photo placeholder */}
         <motion.div variants={fadeUp} className="relative">
           <div className="w-full aspect-[4/5] rounded-3xl overflow-hidden shadow-2xl">
-  <img
-    src="/images/esencia-colegio.jpg"
-    alt="Familia Presentación"
-    className="w-full h-full object-cover"
-  />
-</div>
-         <div
-  className="absolute -bottom-6 -left-6 md:-left-10 p-5 rounded-2xl shadow-2xl"
-  style={{
-    background: "#0E0A35",
-    maxWidth: "200px",
-  }}
->
-  <p className="font-black text-2xl" style={{ color: "#FFCC00", fontFamily: "'Montserrat', sans-serif" }}>
-    +47
-  </p>
-  <p className="text-xs font-bold" style={{ color: "rgba(255,255,255,0.5)", fontFamily: "'Poppins', sans-serif" }}>
-    años formando generaciones
-  </p>
-</div>
+            <img
+              src="/images/esencia-colegio.jpg"
+              alt="Familia Presentación"
+              className="w-full h-full object-cover"
+            />
+          </div>
+          <div
+            className="absolute -bottom-6 -left-6 md:-left-10 p-5 rounded-2xl shadow-2xl"
+            style={{
+              background: "#0E0A35",
+              maxWidth: "200px",
+            }}
+          >
+            <p className="font-black text-2xl" style={{ color: "#FFCC00", fontFamily: "'Montserrat', sans-serif" }}>
+              +47
+            </p>
+            <p className="text-xs font-bold" style={{ color: "rgba(255,255,255,0.5)", fontFamily: "'Poppins', sans-serif" }}>
+              años formando generaciones
+            </p>
+          </div>
         </motion.div>
       </div>
     </Section>
@@ -558,14 +523,15 @@ function EmotionalSection() {
 }
 
 // ─── OPEN HOUSE ───────────────────────────────────────────────────────────────
+// ✅ ACTUALIZADO: Muestra que ya pasó y agradece
 function OpenHouseSection() {
   const steps = [
-  "Bienvenida",
-  "¿Por qué elegir La Presentación?",
-  "Ruta por experiencias",
-  "Proceso de admisión",
-  "Cierre y despedida",
-];
+    "Bienvenida",
+    "¿Por qué elegir La Presentación?",
+    "Ruta por experiencias",
+    "Proceso de admisión",
+    "Cierre y despedida",
+  ];
 
   return (
     <Section
@@ -580,32 +546,32 @@ function OpenHouseSection() {
         <div className="grid md:grid-cols-2 gap-16 items-start">
           <div>
             <motion.div
-  variants={fadeUp}
-  className="inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-bold tracking-wider mb-6"
-  style={{
-    background: "rgba(255,255,255,0.10)",
-    color: "#FFFFFF",
-    border: "1px solid rgba(255,255,255,0.18)",
-    backdropFilter: "blur(16px)",
-  }}
->
-  <span>●</span> 11 de julio · Girardota
-</motion.div>
+              variants={fadeUp}
+              className="inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-bold tracking-wider mb-6"
+              style={{
+                background: "rgba(16,185,129,0.15)",
+                color: "#6EE7B7",
+                border: "1px solid rgba(16,185,129,0.3)",
+                backdropFilter: "blur(16px)",
+              }}
+            >
+              <span>✓</span> Realizado el 11 de julio
+            </motion.div>
 
             <motion.h2
               variants={fadeUp}
               className="font-black text-3xl md:text-5xl leading-tight mb-4"
               style={{ fontFamily: "'Montserrat', sans-serif", color: "#FFFFFF" }}
             >
-              Open House<br />La Presentación
+              Gracias por<br />vivir el Open House
             </motion.h2>
 
             <motion.p
               variants={fadeUp}
-              className="text-white/75 text-lg leading-relaxed mb-8"
+              className="text-white/75 text-lg leading-relaxed mb-6"
               style={{ fontFamily: "'Poppins', sans-serif" }}
             >
-              Queremos abrirte las puertas de nuestra casa para que conozcas lo que somos, lo que creemos y la manera como acompañamos a cada estudiante.
+              El pasado 11 de julio abrimos nuestras puertas para que las familias conocieran lo que somos, lo que creemos y la manera como acompañamos a cada estudiante.
             </motion.p>
 
             <motion.p
@@ -613,39 +579,40 @@ function OpenHouseSection() {
               className="text-white/60 text-base leading-relaxed mb-8"
               style={{ fontFamily: "'Poppins', sans-serif" }}
             >
-              Ese día podrás recorrer nuestros espacios, conversar con el equipo institucional, conocer nuestra propuesta formativa y vivir de cerca el ambiente de familia que nos identifica.
+              Si no pudiste asistir, aún estás a tiempo de iniciar el proceso de admisión. Nuestro equipo está listo para acompañarte y resolver todas tus dudas.
             </motion.p>
 
             <motion.div
               variants={fadeUp}
-              className="flex items-center gap-3 text-sm text-white/65 mb-8"
-              style={{ fontFamily: "'Poppins', sans-serif" }}
+              className="flex flex-wrap items-center gap-4"
             >
-              <span>
-                Puedes asistir hasta con <strong className="text-white">3 personas</strong> de tu familia.
+              <a
+                href={FORM_URL}
+                whileHover={{ scale: 1.03 }}
+                whileTap={{ scale: 0.97 }}
+                className="inline-block px-8 py-4 rounded-full font-bold text-sm tracking-wide transition-all"
+                style={{ background: "#FFFFFF", color: "#21145F", fontFamily: "'Montserrat', sans-serif" }}
+              >
+                Iniciar proceso de admisión
+              </a>
+
+              <span
+                className="text-white/40 text-sm flex items-center gap-2"
+                style={{ fontFamily: "'Poppins', sans-serif" }}
+              >
+                <span className="w-6 h-px bg-white/20" />
+                Sin costo de inscripción
               </span>
             </motion.div>
-
-            <motion.a
-              variants={fadeUp}
-              href={FORM_URL}
-              whileHover={{ scale: 1.03 }}
-              whileTap={{ scale: 0.97 }}
-              className="inline-block px-8 py-4 rounded-full font-bold text-sm tracking-wide transition-all"
-              style={{ background: "#FFFFFF", color: "#21145F", fontFamily: "'Montserrat', sans-serif" }}
-            >
-              Reservar mi cupo
-            </motion.a>
           </div>
 
-          {/* Recorrido steps */}
           <div>
             <motion.p
               variants={fadeUp}
               className="text-xs font-bold tracking-[0.2em] uppercase text-white/45 mb-6"
               style={{ fontFamily: "'Montserrat', sans-serif" }}
             >
-              El recorrido
+              Nuestro recorrido
             </motion.p>
 
             <div className="space-y-0 rounded-3xl border border-white/10 bg-white/[0.06] backdrop-blur-xl p-4">
@@ -658,8 +625,8 @@ function OpenHouseSection() {
                   <div
                     className="w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold flex-shrink-0"
                     style={{
-                      background: i === 0 ? "#FFCC00" : "rgba(255,255,255,0.12)",
-                      color: i === 0 ? "#21145F" : "#FFFFFF",
+                      background: i === 0 ? "#10B981" : "rgba(255,255,255,0.12)",
+                      color: i === 0 ? "#FFFFFF" : "#FFFFFF",
                     }}
                   >
                     {String(i + 1).padStart(2, "0")}
@@ -673,6 +640,15 @@ function OpenHouseSection() {
                 </motion.div>
               ))}
             </div>
+
+            <motion.div
+              variants={fadeUp}
+              className="mt-4 p-4 rounded-2xl border border-white/10 bg-white/[0.04]"
+            >
+              <p className="text-white/50 text-xs leading-relaxed" style={{ fontFamily: "'Poppins', sans-serif" }}>
+                💡 El proceso de admisión continúa abierto. Puedes iniciarlo en cualquier momento.
+              </p>
+            </motion.div>
           </div>
         </div>
       </div>
@@ -680,7 +656,7 @@ function OpenHouseSection() {
   );
 }
 
-// ─── STATS / DATOS VIVOS ──────────────────────────────────────────────────────
+// ─── STATS ────────────────────────────────────────────────────────────────────
 function StatsSection() {
   const ref = useRef(null);
   const inView = useInView(ref, { once: true, margin: "-100px" });
@@ -722,39 +698,39 @@ function StatsSection() {
           </motion.div>
 
           <motion.div
-  variants={fadeUp}
-  className="rounded-3xl p-6 flex flex-col justify-between border border-white/20"
-  style={{
-    background: "rgba(255,255,255,0.16)",
-    minHeight: "180px",
-    backdropFilter: "blur(22px)",
-    boxShadow: "inset 0 1px 0 rgba(255,255,255,0.14)",
-  }}
->
-  <p
-    className="text-white/60 text-xs font-medium tracking-widest uppercase"
-    style={{ fontFamily: "'Montserrat', sans-serif" }}
-  >
-    Años
-  </p>
+            variants={fadeUp}
+            className="rounded-3xl p-6 flex flex-col justify-between border border-white/20"
+            style={{
+              background: "rgba(255,255,255,0.16)",
+              minHeight: "180px",
+              backdropFilter: "blur(22px)",
+              boxShadow: "inset 0 1px 0 rgba(255,255,255,0.14)",
+            }}
+          >
+            <p
+              className="text-white/60 text-xs font-medium tracking-widest uppercase"
+              style={{ fontFamily: "'Montserrat', sans-serif" }}
+            >
+              Años
+            </p>
 
-  <div>
-    <p
-      className="font-black text-5xl md:text-6xl"
-      style={{
-        color: "#FFFFFF",
-        fontFamily: "'Montserrat', sans-serif",
-        textShadow: "0 12px 40px rgba(0,0,0,0.35)",
-      }}
-    >
-      +{inView ? years : 0}
-    </p>
+            <div>
+              <p
+                className="font-black text-5xl md:text-6xl"
+                style={{
+                  color: "#FFFFFF",
+                  fontFamily: "'Montserrat', sans-serif",
+                  textShadow: "0 12px 40px rgba(0,0,0,0.35)",
+                }}
+              >
+                +{inView ? years : 0}
+              </p>
 
-    <p className="text-xs mt-1" style={{ fontFamily: "'Poppins', sans-serif", color: "rgba(255,255,255,0.6)" }}>
-  acompañando generaciones
-</p>
-  </div>
-</motion.div>
+              <p className="text-xs mt-1" style={{ fontFamily: "'Poppins', sans-serif", color: "rgba(255,255,255,0.6)" }}>
+                acompañando generaciones
+              </p>
+            </div>
+          </motion.div>
 
           <motion.div
             variants={fadeUp}
@@ -770,7 +746,7 @@ function StatsSection() {
                 4
               </p>
               <p className="text-white/50 text-xs mt-1" style={{ fontFamily: "'Poppins', sans-serif" }}>
-                Preescolar · Básica Primaria ·      Básica Secundaria · Media Académica
+                Preescolar · Básica Primaria · Básica Secundaria · Media Académica
               </p>
             </div>
           </motion.div>
@@ -851,17 +827,17 @@ function DifferentialsSection() {
             </p>
 
             <a
-  href={FORM_URL}
-  className="px-8 py-3 rounded-full font-bold text-sm tracking-wide flex-shrink-0 transition-all duration-300 hover:scale-[1.03]"
-  style={{
-    background: "#FFFFFF",
-    color: "#21145F",
-    fontFamily: "'Montserrat', sans-serif",
-    boxShadow: "0 18px 50px rgba(0,0,0,0.18)",
-  }}
->
-  Iniciar registro
-</a>
+              href={FORM_URL}
+              className="px-8 py-3 rounded-full font-bold text-sm tracking-wide flex-shrink-0 transition-all duration-300 hover:scale-[1.03]"
+              style={{
+                background: "#FFFFFF",
+                color: "#21145F",
+                fontFamily: "'Montserrat', sans-serif",
+                boxShadow: "0 18px 50px rgba(0,0,0,0.18)",
+              }}
+            >
+              Iniciar proceso de admisión
+            </a>
           </motion.div>
         </div>
       </div>
@@ -980,58 +956,32 @@ function GallerySection() {
               whileHover={{ scale: 1.02, transition: { duration: 0.3 } }}
               className="relative rounded-2xl overflow-hidden cursor-pointer"
               style={{
-  aspectRatio: i % 5 === 0 ? "1/1.3" : i % 3 === 0 ? "1/0.8" : "1/1",
-  backgroundImage: `url(${item.image})`,
-  backgroundSize: "cover",
-  backgroundPosition: "center",
-  backgroundColor: item.color,
-}}
+                aspectRatio: i % 5 === 0 ? "1/1.3" : i % 3 === 0 ? "1/0.8" : "1/1",
+                backgroundImage: `url(${item.image})`,
+                backgroundSize: "cover",
+                backgroundPosition: "center",
+                backgroundColor: item.color,
+              }}
             >
-              <motion.div
-  key={i}
-  variants={fadeUp}
-  whileHover={{ scale: 1.02, transition: { duration: 0.3 } }}
-  className="relative rounded-2xl overflow-hidden cursor-pointer"
-  style={{
-    aspectRatio: i % 5 === 0 ? "1/1.3" : i % 3 === 0 ? "1/0.8" : "1/1",
-    backgroundImage: `url(${item.image})`,
-    backgroundSize: "cover",
-    backgroundPosition: "center",
-    backgroundColor: item.color,
-  }}
->
-  <div
-    className="absolute inset-0"
-    style={{
-      background: "linear-gradient(to top, rgba(0,0,0,0.7) 0%, transparent 60%)",
-    }}
-  />
-
-  <div className="absolute bottom-0 left-0 p-4">
-    <p
-      className="text-white font-black text-xl italic"
-      style={{ fontFamily: "'Playfair Display', serif" }}
-    >
-      {item.word}
-    </p>
-
-    <p
-      className="text-white/60 text-xs font-medium tracking-widest uppercase"
-      style={{ fontFamily: "'Montserrat', sans-serif" }}
-    >
-      {item.title}
-    </p>
-  </div>
-</motion.div>
-
-              <div className="absolute inset-0" style={{ background: "linear-gradient(to top, rgba(0,0,0,0.7) 0%, transparent 60%)" }} />
+              <div
+                className="absolute inset-0"
+                style={{
+                  background: "linear-gradient(to top, rgba(0,0,0,0.7) 0%, transparent 60%)",
+                }}
+              />
 
               <div className="absolute bottom-0 left-0 p-4">
-                <p className="text-white font-black text-xl italic" style={{ fontFamily: "'Playfair Display', serif" }}>
+                <p
+                  className="text-white font-black text-xl italic"
+                  style={{ fontFamily: "'Playfair Display', serif" }}
+                >
                   {item.word}
                 </p>
 
-                <p className="text-white/60 text-xs font-medium tracking-widest uppercase" style={{ fontFamily: "'Montserrat', sans-serif" }}>
+                <p
+                  className="text-white/60 text-xs font-medium tracking-widest uppercase"
+                  style={{ fontFamily: "'Montserrat', sans-serif" }}
+                >
                   {item.title}
                 </p>
               </div>
@@ -1044,6 +994,7 @@ function GallerySection() {
 }
 
 // ─── TIMELINE ─────────────────────────────────────────────────────────────────
+// ✅ ACTUALIZADO: Usa TIMELINE_STEPS sin Open House
 function TimelineSection() {
   return (
     <Section className="py-20 md:py-28 px-6 md:px-12" style={{ background: "#FFFFFF" }}>
@@ -1060,7 +1011,7 @@ function TimelineSection() {
           Tu camino para hacer parte de<br />familia Presentación.
         </motion.h2>
 
-        <div className="hidden md:grid md:grid-cols-6 gap-4 relative">
+        <div className="hidden md:grid md:grid-cols-5 gap-4 relative">
           <div className="absolute top-8 left-[8%] right-[8%] h-px" style={{ background: "linear-gradient(to right, #FFCC00, #21145F)" }} />
 
           {TIMELINE_STEPS.map((step, i) => (
@@ -1127,6 +1078,7 @@ function TimelineSection() {
 }
 
 // ─── REGISTRO ─────────────────────────────────────────────────────────────────
+// ✅ ACTUALIZADO: Solo admisión, eliminadas las dos opciones de Open House
 function RegistroSection() {
   return (
     <Section
@@ -1146,7 +1098,7 @@ function RegistroSection() {
           className="font-black text-3xl md:text-5xl text-center mb-4 leading-tight"
           style={{ fontFamily: "'Montserrat', sans-serif", color: "#FFFFFF" }}
         >
-          Un solo registro.<br />Dos caminos posibles.
+          Inicia el proceso de admisión
         </motion.h2>
 
         <motion.p
@@ -1154,103 +1106,152 @@ function RegistroSection() {
           className="text-white/65 text-lg text-center mb-12 max-w-2xl mx-auto"
           style={{ fontFamily: "'Poppins', sans-serif" }}
         >
-          Sabemos que cada familia vive este proceso de manera diferente. Por eso, el registro será claro, sencillo y personalizado.
+          El proceso de admisión 2027 está abierto. Regístrate y nuestro equipo te acompañará en cada paso.
         </motion.p>
 
-        <div className="grid md:grid-cols-2 gap-6">
-          {[
-            {
-              tag: "Quiero asistir",
-              title: "Quiero asistir al Open House",
-              text: "Registra hasta 3 personas de tu familia y continúa con los datos iniciales del aspirante.",
-              accent: true,
-            },
-            {
-              tag: "Solo información",
-              title: "No puedo asistir, pero quiero información",
-              text: "Déjanos tus datos y el equipo de admisiones te acompañará en el proceso.",
-              accent: false,
-            },
-          ].map((card, i) => (
-            <motion.div
-              key={i}
-              variants={fadeUp}
-              whileHover={{ y: -4, transition: { duration: 0.3 } }}
-              className="p-8 rounded-3xl border-2 flex flex-col justify-between gap-8"
-              style={{
-                background: card.accent ? "#FFFFFF" : "rgba(255,255,255,0.08)",
-                borderColor: card.accent ? "#FFFFFF" : "rgba(255,255,255,0.16)",
-              }}
-            >
-              <div>
-                <div
-  className="inline-block px-3 py-1 rounded-full text-xs font-bold tracking-wide mb-4"
-  style={{
-    background: card.accent ? "#F7F8FC" : "rgba(255,255,255,0.12)",
-    color: card.accent ? "#21145F" : "#FFFFFF",
-    border: card.accent ? "1px solid #E8EAF0" : "1px solid rgba(255,255,255,0.18)",
-  }}
->
-  {card.tag}
-</div>
-
-                <h3
-                  className="font-black text-xl mb-3"
-                  style={{
-                    color: card.accent ? "#21145F" : "#FFFFFF",
-                    fontFamily: "'Montserrat', sans-serif",
-                  }}
-                >
-                  {card.title}
-                </h3>
-
-                <p
-                  className="text-sm leading-relaxed"
-                  style={{
-                    color: card.accent ? "#6B7280" : "rgba(255,255,255,0.65)",
-                    fontFamily: "'Poppins', sans-serif",
-                  }}
-                >
-                  {card.text}
-                </p>
+        <div className="grid md:grid-cols-2 gap-6 max-w-3xl mx-auto">
+          <motion.div
+            variants={fadeUp}
+            whileHover={{ y: -4, transition: { duration: 0.3 } }}
+            className="md:col-span-2 p-8 rounded-3xl border-2 flex flex-col justify-between gap-6"
+            style={{
+              background: "#FFFFFF",
+              borderColor: "#FFFFFF",
+            }}
+          >
+            <div>
+              <div
+                className="inline-block px-3 py-1 rounded-full text-xs font-bold tracking-wide mb-4"
+                style={{
+                  background: "#F7F8FC",
+                  color: "#21145F",
+                  border: "1px solid #E8EAF0",
+                }}
+              >
+                Proceso activo
               </div>
 
-              <a
-                href={FORM_URL}
-                className="inline-block px-6 py-3 rounded-full font-bold text-sm text-center transition-all hover:opacity-90"
+              <h3
+                className="font-black text-xl mb-3"
                 style={{
-                  background: card.accent ? "#21145F" : "#FFFFFF",
-                  color: card.accent ? "#FFFFFF" : "#21145F",
+                  color: "#21145F",
                   fontFamily: "'Montserrat', sans-serif",
                 }}
               >
-                Iniciar registro
-              </a>
-            </motion.div>
-          ))}
+                Iniciar proceso de admisión
+              </h3>
+
+              <p
+                className="text-sm leading-relaxed"
+                style={{
+                  color: "#6B7280",
+                  fontFamily: "'Poppins', sans-serif",
+                }}
+              >
+                Completa el registro con los datos del aspirante y los acudientes. El equipo de admisiones se comunicará contigo para orientarte en los siguientes pasos.
+              </p>
+
+              <div className="mt-4 flex flex-wrap gap-2">
+                <span className="text-xs px-3 py-1 rounded-full bg-[#EEF2FF] text-[#1A428A] font-medium">
+                  Sin costo de inscripción
+                </span>
+                <span className="text-xs px-3 py-1 rounded-full bg-[#F0FDF4] text-[#059669] font-medium">
+                  Acompañamiento personalizado
+                </span>
+              </div>
+            </div>
+
+            <a
+              href={FORM_URL}
+              className="inline-block px-6 py-3 rounded-full font-bold text-sm text-center transition-all hover:opacity-90 w-full md:w-auto"
+              style={{
+                background: "#21145F",
+                color: "#FFFFFF",
+                fontFamily: "'Montserrat', sans-serif",
+              }}
+            >
+              Iniciar registro
+            </a>
+          </motion.div>
+
+          <motion.div
+            variants={fadeUp}
+            whileHover={{ y: -4, transition: { duration: 0.3 } }}
+            className="md:col-span-2 p-8 rounded-3xl border-2 flex flex-col justify-between gap-6"
+            style={{
+              background: "rgba(255,255,255,0.08)",
+              borderColor: "rgba(255,255,255,0.16)",
+            }}
+          >
+            <div>
+              <div
+                className="inline-block px-3 py-1 rounded-full text-xs font-bold tracking-wide mb-4"
+                style={{
+                  background: "rgba(255,255,255,0.12)",
+                  color: "#FFFFFF",
+                  border: "1px solid rgba(255,255,255,0.18)",
+                }}
+              >
+                Seguimiento
+              </div>
+
+              <h3
+                className="font-black text-xl mb-3"
+                style={{
+                  color: "#FFFFFF",
+                  fontFamily: "'Montserrat', sans-serif",
+                }}
+              >
+                ¿Ya iniciaste tu proceso?
+              </h3>
+
+              <p
+                className="text-sm leading-relaxed"
+                style={{
+                  color: "rgba(255,255,255,0.65)",
+                  fontFamily: "'Poppins', sans-serif",
+                }}
+              >
+                Consulta el estado de admisión de tu hijo con el correo o celular registrado por la familia.
+              </p>
+            </div>
+
+            <a
+              href="#consulta-proceso"
+              className="inline-block px-6 py-3 rounded-full font-bold text-sm text-center transition-all hover:opacity-90 w-full md:w-auto"
+              style={{
+                background: "rgba(255,255,255,0.15)",
+                color: "#FFFFFF",
+                fontFamily: "'Montserrat', sans-serif",
+                border: "1px solid rgba(255,255,255,0.2)",
+              }}
+            >
+              Consultar mi proceso
+            </a>
+          </motion.div>
         </div>
       </div>
     </Section>
   );
 }
 
-// ─── CONSULTA DE ESTADO DE ADMISIÓN ───────────────────────────────────────────
+// ─── CONSULTA DE ESTADO ──────────────────────────────────────────────────────
 function AdmissionStatusSection() {
   const [open, setOpen] = useState(false);
 
-useEffect(() => {
-  const params = new URLSearchParams(window.location.search);
-  if (params.get("consultar") === "1") {
-    setOpen(true);
-    window.history.replaceState({}, "", window.location.pathname);
-  }
-}, []);
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    if (params.get("consultar") === "1") {
+      setOpen(true);
+      window.history.replaceState({}, "", window.location.pathname);
+    }
+  }, []);
 
   return (
     <>
       <Section
-  id="consulta-proceso"
-  className="py-16 md:py-20 px-6 md:px-12"
+        id="consulta-proceso"
+        className="py-16 md:py-20 px-6 md:px-12"
         style={{
           background:
             "linear-gradient(135deg, #F7F8FC 0%, #FFFFFF 45%, #EEF2FF 100%)",
@@ -1406,6 +1407,7 @@ useEffect(() => {
   );
 }
 
+// ─── ADMISSION STATUS MODAL ──────────────────────────────────────────────────
 function AdmissionStatusModal({ open, onClose }) {
   const [query, setQuery] = useState("");
   const [searched, setSearched] = useState(false);
@@ -1421,46 +1423,46 @@ function AdmissionStatusModal({ open, onClose }) {
   }
 
   async function handleSearch(e) {
-  e.preventDefault();
+    e.preventDefault();
 
-  const q = normalize(query);
-  if (!q) return;
+    const q = normalize(query);
+    if (!q) return;
 
-  setLoading(true);
+    setLoading(true);
 
-  try {
-    const esCorreo = q.includes("@");
-    const esCelular = /^\d+$/.test(q);
-    
-    let resultado;
-    if (esCorreo) {
-      resultado = await consultarEstado(q, null);
-    } else if (esCelular) {
-      resultado = await consultarEstado(null, q);
-    } else {
+    try {
+      const esCorreo = q.includes("@");
+      const esCelular = /^\d+$/.test(q);
+      
+      let resultado;
+      if (esCorreo) {
+        resultado = await consultarEstado(q, null);
+      } else if (esCelular) {
+        resultado = await consultarEstado(null, q);
+      } else {
+        setResults([]);
+        setSearched(true);
+        setLoading(false);
+        return;
+      }
+      
+      if (resultado && resultado.success && resultado.data) {
+        const found = resultado.data;
+        setResults(found);
+        setSelected(found.length === 1 ? found[0] : null);
+        setSearched(true);
+      } else {
+        setResults([]);
+        setSearched(true);
+      }
+    } catch (error) {
+      console.error("Error al consultar:", error);
       setResults([]);
       setSearched(true);
+    } finally {
       setLoading(false);
-      return;
     }
-    
-    if (resultado && resultado.success && resultado.data) {
-      const found = resultado.data;
-      setResults(found);
-      setSelected(found.length === 1 ? found[0] : null);
-      setSearched(true);
-    } else {
-      setResults([]);
-      setSearched(true);
-    }
-  } catch (error) {
-    console.error("Error al consultar:", error);
-    setResults([]);
-    setSearched(true);
-  } finally {
-    setLoading(false);
   }
-}
 
   function resetSearch() {
     setQuery("");
@@ -1542,12 +1544,12 @@ function AdmissionStatusModal({ open, onClose }) {
                   </div>
 
                   <button
-  type="submit"
-  disabled={loading}
-  className="w-full rounded-full px-6 py-4 bg-[#21145F] text-white font-bold text-sm tracking-wide transition-all hover:scale-[1.01]"
->
-  {loading ? "Consultando..." : "Consultar proceso"}
-</button>
+                    type="submit"
+                    disabled={loading}
+                    className="w-full rounded-full px-6 py-4 bg-[#21145F] text-white font-bold text-sm tracking-wide transition-all hover:scale-[1.01]"
+                  >
+                    {loading ? "Consultando..." : "Consultar proceso"}
+                  </button>
                 </form>
 
                 <p
@@ -1685,44 +1687,41 @@ function AdmissionStatusDetail({ item, onBack, onReset }) {
   const activeIndex = getStepIndex(item.estado);
 
   function formatFecha(fechaIso) {
-  if (!fechaIso || fechaIso === "Por confirmar" || fechaIso === "") return "Por confirmar";
-  
-  try {
-    const fecha = new Date(fechaIso);
-    if (isNaN(fecha.getTime()) || fecha.getFullYear() < 1900) return "Por confirmar";
+    if (!fechaIso || fechaIso === "Por confirmar" || fechaIso === "") return "Por confirmar";
     
-    // ✅ NUEVO: Incluye el día de la semana
-    return fecha.toLocaleDateString('es-CO', {
-      weekday: 'long',
-      year: 'numeric',
-      month: 'long',
-      day: 'numeric'
-    });
-  } catch {
-    return "Por confirmar";
-  }
-}
-
-function formatHora(horaIso) {
-  if (!horaIso || horaIso === "Por confirmar" || horaIso === "") return "Por confirmar";
-  
-  try {
-    // Si es formato ISO (incluye T)
-    if (horaIso.includes("T")) {
-      const fecha = new Date(horaIso);
-      if (isNaN(fecha.getTime())) return horaIso;
-      return fecha.toLocaleTimeString('es-CO', {
-        hour: '2-digit',
-        minute: '2-digit',
-        hour12: true
+    try {
+      const fecha = new Date(fechaIso);
+      if (isNaN(fecha.getTime()) || fecha.getFullYear() < 1900) return "Por confirmar";
+      
+      return fecha.toLocaleDateString('es-CO', {
+        weekday: 'long',
+        year: 'numeric',
+        month: 'long',
+        day: 'numeric'
       });
+    } catch {
+      return "Por confirmar";
     }
-    // Si ya es texto legible, devolverlo tal cual
-    return horaIso;
-  } catch {
-    return horaIso;
   }
-}
+
+  function formatHora(horaIso) {
+    if (!horaIso || horaIso === "Por confirmar" || horaIso === "") return "Por confirmar";
+    
+    try {
+      if (horaIso.includes("T")) {
+        const fecha = new Date(horaIso);
+        if (isNaN(fecha.getTime())) return horaIso;
+        return fecha.toLocaleTimeString('es-CO', {
+          hour: '2-digit',
+          minute: '2-digit',
+          hour12: true
+        });
+      }
+      return horaIso;
+    } catch {
+      return horaIso;
+    }
+  }
 
   return (
     <div>
@@ -1812,26 +1811,26 @@ function formatHora(horaIso) {
         </div>
       </div>
 
-            <div className="grid md:grid-cols-3 gap-4 mb-6">
-  <StatusInfoCard
-    title="Prueba o pasantía"
-    date={formatFecha(item["Prueba fecha"])}
-    hour={formatHora(item["Prueba hora"])}
-    detail={item["Tipo actividad"]}
-  />
-  <StatusInfoCard
-    title="Entrevista"
-    date={formatFecha(item["Entrevista fecha"])}
-    hour={formatHora(item["Entrevista hora"])}
-    detail={item["Responsable entrevista"]}
-  />
-  <StatusInfoCard
-    title="Inducción"
-    date={formatFecha(item["Inducción fecha"])}
-    hour={formatHora(item["Inducción hora"])}
-    detail="Nuevas familias"
-  />
-</div>
+      <div className="grid md:grid-cols-3 gap-4 mb-6">
+        <StatusInfoCard
+          title="Prueba o pasantía"
+          date={formatFecha(item["Prueba fecha"])}
+          hour={formatHora(item["Prueba hora"])}
+          detail={item["Tipo actividad"]}
+        />
+        <StatusInfoCard
+          title="Entrevista"
+          date={formatFecha(item["Entrevista fecha"])}
+          hour={formatHora(item["Entrevista hora"])}
+          detail={item["Responsable entrevista"]}
+        />
+        <StatusInfoCard
+          title="Inducción"
+          date={formatFecha(item["Inducción fecha"])}
+          hour={formatHora(item["Inducción hora"])}
+          detail="Nuevas familias"
+        />
+      </div>
 
       {item.observacion && (
         <div className="rounded-3xl bg-[#F7F8FC] p-5 border border-gray-100">
@@ -2016,20 +2015,20 @@ function ClosingSection() {
         </motion.p>
 
         <motion.a
-  variants={fadeUp}
-  href={FORM_URL}
-  whileHover={{ scale: 1.05 }}
-  whileTap={{ scale: 0.97 }}
-  className="inline-block px-12 py-5 rounded-full font-black text-base tracking-wide transition-all"
-  style={{
-    background: "#FFFFFF",
-    color: "#0E0A35",
-    fontFamily: "'Montserrat', sans-serif",
-    boxShadow: "0 24px 80px rgba(0,0,0,0.28)",
-  }}
->
-  Iniciar registro
-</motion.a>
+          variants={fadeUp}
+          href={FORM_URL}
+          whileHover={{ scale: 1.05 }}
+          whileTap={{ scale: 0.97 }}
+          className="inline-block px-12 py-5 rounded-full font-black text-base tracking-wide transition-all"
+          style={{
+            background: "#FFFFFF",
+            color: "#0E0A35",
+            fontFamily: "'Montserrat', sans-serif",
+            boxShadow: "0 24px 80px rgba(0,0,0,0.28)",
+          }}
+        >
+          Iniciar proceso de admisión
+        </motion.a>
 
         <motion.div variants={fadeUp} className="mt-16 pt-12 border-t border-white/10">
           <p className="text-white/30 text-xs tracking-widest uppercase" style={{ fontFamily: "'Montserrat', sans-serif" }}>
@@ -2046,6 +2045,7 @@ function ClosingSection() {
 }
 
 // ─── MOBILE STICKY CTA ────────────────────────────────────────────────────────
+// ✅ ACTUALIZADO: Texto a "Iniciar proceso de admisión"
 function MobileCTA() {
   const [show, setShow] = useState(false);
 
@@ -2074,13 +2074,13 @@ function MobileCTA() {
             href={FORM_URL}
             className="block w-full py-4 rounded-full font-black text-sm text-center tracking-wide"
             style={{
-  background: "#FFFFFF",
-  color: "#0E0A35",
-  fontFamily: "'Montserrat', sans-serif",
-  boxShadow: "0 18px 60px rgba(0,0,0,0.35)",
-}}
+              background: "#FFFFFF",
+              color: "#0E0A35",
+              fontFamily: "'Montserrat', sans-serif",
+              boxShadow: "0 18px 60px rgba(0,0,0,0.35)",
+            }}
           >
-            Iniciar registro
+            Iniciar proceso de admisión
           </a>
         </motion.div>
       )}
@@ -2112,11 +2112,11 @@ function LandingAdmisiones() {
 export default function App() {
   return (
     <BrowserRouter>
-  <Routes>
-    <Route path="/" element={<LandingAdmisiones />} />
-    <Route path="/admisiones" element={<AdmisionesRegistro />} />
-    <Route path="/admisiones/registro" element={<Registro />} />
-  </Routes>
-</BrowserRouter>
+      <Routes>
+        <Route path="/" element={<LandingAdmisiones />} />
+        <Route path="/admisiones" element={<AdmisionesRegistro />} />
+        <Route path="/admisiones/registro" element={<Registro />} />
+      </Routes>
+    </BrowserRouter>
   );
 }
