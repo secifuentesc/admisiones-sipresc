@@ -583,23 +583,12 @@ function OpenHouseSection() {
             </motion.p>
 
             <motion.div
-              variants={fadeUp}
-              className="flex flex-wrap items-center gap-4"
-            >
+          
               <a
-                href={FORM_URL}
-                whileHover={{ scale: 1.03 }}
-                whileTap={{ scale: 0.97 }}
-                className="inline-block px-8 py-4 rounded-full font-bold text-sm tracking-wide transition-all"
-                style={{ background: "#FFFFFF", color: "#21145F", fontFamily: "'Montserrat', sans-serif" }}
-              >
+              
                 Iniciar proceso de admisión
               </a>
 
-              <span
-                className="text-white/40 text-sm flex items-center gap-2"
-                style={{ fontFamily: "'Poppins', sans-serif" }}
-              >
             
             </motion.div>
           </div>
